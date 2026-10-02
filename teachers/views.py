@@ -10,7 +10,7 @@ from academics.models import ClassSection, AcademicYear
 @login_required
 @principal_or_admin_required
 def teacher_list(request):
-    teachers = Teacher.objects.all().prefetch_related('allocations__class_section', 'allocations__class_section__grade_level')
+    teachers = Teacher.objects.all().select_related('user').prefetch_related('allocations__class_section', 'allocations__class_section__grade_level')
     return render(request, 'teachers/teacher_list.html', {'teachers': teachers})
 
 
@@ -19,10 +19,22 @@ def teacher_list(request):
 def create_teacher(request):
     """
     Principal or Admin can create a new Teacher account and profile.
+    Automatically suggests the next teacher username and default password.
     """
+    next_idx = Teacher.objects.count() + 1
+    suggested_username = f"teacher{next_idx}"
+    while User.objects.filter(username=suggested_username).exists():
+        next_idx += 1
+        suggested_username = f"teacher{next_idx}"
+
+    context = {
+        'suggested_username': suggested_username,
+        'default_password': 'teacher123'
+    }
+
     if request.method == 'POST':
-        username = request.POST.get('username', '').strip()
-        password = request.POST.get('password', '').strip()
+        username = request.POST.get('username', '').strip() or suggested_username
+        password = request.POST.get('password', '').strip() or 'teacher123'
         title = request.POST.get('title', 'MR')
         full_name = request.POST.get('full_name', '').strip()
         name_initials = request.POST.get('name_initials', '').strip()
@@ -33,11 +45,11 @@ def create_teacher(request):
 
         if not username or not password or not full_name or not phone:
             messages.error(request, 'කරුණාකර අවශ්‍ය සියලු තොරතුරු ඇතුළත් කරන්න.')
-            return render(request, 'teachers/teacher_form.html')
+            return render(request, 'teachers/teacher_form.html', context)
 
         if User.objects.filter(username=username).exists():
             messages.error(request, f'"{username}" පරිශීලක නාමය දැනටමත් භාවිතයේ පවතී.')
-            return render(request, 'teachers/teacher_form.html')
+            return render(request, 'teachers/teacher_form.html', context)
 
         # Create auth User
         user = User.objects.create_user(username=username, password=password)
@@ -59,10 +71,10 @@ def create_teacher(request):
             qualifications=qualifications,
         )
 
-        messages.success(request, f'ගුරුභවතා {teacher.display_name} සාර්ථකව පද්ධතියට එක් කරන ලදී. (පරිශීලක නාමය: {username}) - ගුරුභවතාට තම ගිණුමෙන් (Account) මුරපදය වෙනස් කරගත හැක.')
+        messages.success(request, f'ගුරුභවතා {teacher.display_name} සාර්ථකව පද්ධතියට එක් කරන ලදී. (Username: {username} | මුරපදය: {password})')
         return redirect('teacher_list')
 
-    return render(request, 'teachers/teacher_form.html')
+    return render(request, 'teachers/teacher_form.html', context)
 
 
 @login_required

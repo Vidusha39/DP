@@ -98,43 +98,195 @@ class Command(BaseCommand):
             defaults={'role': 'PRINCIPAL', 'phone': '0719876543'}
         )
         self.stdout.write(self.style.SUCCESS("Principal account created: principal / principal123"))
-
-        # Teacher 1 (teacher1 / teacher123)
-        teacher_user, created = User.objects.get_or_create(username='teacher1')
-        teacher_user.set_password('teacher123')
-        teacher_user.first_name = "ගයාන්"
-        teacher_user.last_name = "පෙරේරා"
-        teacher_user.save()
-        UserProfile.objects.update_or_create(
-            user=teacher_user,
-            defaults={'role': 'TEACHER', 'phone': '0754433221'}
-        )
-
-        teacher_profile, _ = Teacher.objects.update_or_create(
-            user=teacher_user,
-            defaults={
+        # Teachers (teacher1 to teacher13 / teacher123) for every grade (1 to 13)
+        teachers_seed_info = [
+            {
+                'order': 1,
+                'username': 'teacher1',
                 'title': 'MR',
-                'full_name_sinhala': 'කේ. ඩී. ගයාන් පෙරේරා',
-                'name_with_initials': 'කේ. ඩී. ජී. පෙරේරා',
+                'first_name': 'ගයාන්',
+                'last_name': 'පෙරේරා',
+                'full_name': 'කේ. ඩී. ගයාන් පෙරේරා',
+                'initials': 'කේ. ඩී. ජී. පෙරේරා',
                 'phone': '0754433221',
-                'whatsapp_phone': '0754433221',
-                'address': 'නො. 45, විහාර මාවත, නගරය',
                 'qualifications': 'ධර්මාචාර්ය විභාගය සම්මාන සාමාර්ථ, BA (Kelaniya)',
-                'date_joined': date(2022, 1, 1),
-                'is_active': True,
-            }
-        )
-        self.stdout.write(self.style.SUCCESS("Teacher account created: teacher1 / teacher123"))
+            },
+            {
+                'order': 2,
+                'username': 'teacher2',
+                'title': 'MRS',
+                'first_name': 'නිලන්ති',
+                'last_name': 'කුමාරි',
+                'full_name': 'ඩබ්ලිව්. ඒ. නිලන්ති කුමාරි',
+                'initials': 'ඩබ්ලිව්. ඒ. එන්. කුමාරි',
+                'phone': '0712345602',
+                'qualifications': 'පෙර පාසල් ඩිප්ලෝමාව, ධර්මාචාර්ය',
+            },
+            {
+                'order': 3,
+                'username': 'teacher3',
+                'title': 'MR',
+                'first_name': 'චාමින්ද',
+                'last_name': 'කුමාර',
+                'full_name': 'එච්. එම්. චාමින්ද කුමාර',
+                'initials': 'එච්. එම්. සී. කුමාර',
+                'phone': '0712345603',
+                'qualifications': 'ධර්මාචාර්ය, ශාස්ත්‍රවේදී උපාධිය',
+            },
+            {
+                'order': 4,
+                'username': 'teacher4',
+                'title': 'MRS',
+                'first_name': 'සුනේත්‍රා',
+                'last_name': 'රත්නායක',
+                'full_name': 'ආර්. ඩී. සුනේත්‍රා රත්නායක',
+                'initials': 'ආර්. ඩී. එස්. රත්නායක',
+                'phone': '0712345604',
+                'qualifications': 'ගුරු පුහුණු ඩිප්ලෝමාව, ධර්මාචාර්ය',
+            },
+            {
+                'order': 5,
+                'username': 'teacher5',
+                'title': 'VEN',
+                'first_name': 'තිස්ස',
+                'last_name': 'හිමි',
+                'full_name': 'පූජ්‍ය මීගහවෙල තිස්ස හිමි',
+                'initials': 'පූජ්‍ය එම්. තිස්ස හිමි',
+                'phone': '0712345605',
+                'qualifications': 'ප්‍රාචීන ප්‍රාරම්භ, ධර්මාචාර්ය',
+            },
+            {
+                'order': 6,
+                'username': 'teacher6',
+                'title': 'MISS',
+                'first_name': 'පියුමි',
+                'last_name': 'හංසිකා',
+                'full_name': 'කේ. ඒ. පියුමි හංසිකා',
+                'initials': 'කේ. ඒ. පී. හංසිකා',
+                'phone': '0712345606',
+                'qualifications': 'B.Sc. (Hons), ධර්මාචාර්ය විභාගය',
+            },
+            {
+                'order': 7,
+                'username': 'teacher7',
+                'title': 'MR',
+                'first_name': 'රංජිත්',
+                'last_name': 'ප්‍රනාන්දු',
+                'full_name': 'එස්. පී. රංජිත් ප්‍රනාන්දු',
+                'initials': 'එස්. පී. ආර්. ප්‍රනාන්දු',
+                'phone': '0712345607',
+                'qualifications': 'ධර්මාචාර්ය, අධ්‍යාපන ඩිප්ලෝමා',
+            },
+            {
+                'order': 8,
+                'username': 'teacher8',
+                'title': 'MRS',
+                'first_name': 'සුජාතා',
+                'last_name': 'දිසානායක',
+                'full_name': 'එම්. කේ. සුජාතා දිසානායක',
+                'initials': 'එම්. කේ. එස්. දිසානායක',
+                'phone': '0712345608',
+                'qualifications': 'BA (Kelaniya), ධර්මාචාර්ය',
+            },
+            {
+                'order': 9,
+                'username': 'teacher9',
+                'title': 'VEN',
+                'first_name': 'සුමංගල',
+                'last_name': 'හිමි',
+                'full_name': 'පූජ්‍ය රජගිරි සුමංගල හිමි',
+                'initials': 'පූජ්‍ය ආර්. සුමංගල හිමි',
+                'phone': '0712345609',
+                'qualifications': 'ප්‍රාචීන මධ්‍යම, රාජකීය පණ්ඩිත',
+            },
+            {
+                'order': 10,
+                'username': 'teacher10',
+                'title': 'MR',
+                'first_name': 'ලක්ෂ්මන්',
+                'last_name': 'ජයවර්ධන',
+                'full_name': 'බී. එම්. ලක්ෂ්මන් ජයවර්ධන',
+                'initials': 'බී. එම්. එල්. ජයවර්ධන',
+                'phone': '0712345610',
+                'qualifications': 'ධර්මාචාර්ය, විශ්‍රාමික විදුහල්පති',
+            },
+            {
+                'order': 11,
+                'username': 'teacher11',
+                'title': 'MRS',
+                'first_name': 'මල්කාන්ති',
+                'last_name': 'සේනාරත්න',
+                'full_name': 'ඩී. ජී. මල්කාන්ති සේනාරත්න',
+                'initials': 'ඩී. ජී. එම්. සේනාරත්න',
+                'phone': '0712345611',
+                'qualifications': 'ධර්මාචාර්ය සම්මාන, MA (BPU)',
+            },
+            {
+                'order': 12,
+                'username': 'teacher12',
+                'title': 'VEN',
+                'first_name': 'ආනන්ද',
+                'last_name': 'හිමි',
+                'full_name': 'පූජ්‍ය බෙල්ලන ආනන්ද හිමි',
+                'initials': 'පූජ්‍ය බී. ආනන්ද හිමි',
+                'phone': '0712345612',
+                'qualifications': 'රාජකීය පණ්ඩිත, MA (Pali & Buddhist)',
+            },
+            {
+                'order': 13,
+                'username': 'teacher13',
+                'title': 'MR',
+                'first_name': 'සෝමසිරි',
+                'last_name': 'විජේතුංග',
+                'full_name': 'එන්. එස්. සෝමසිරි විජේතුංග',
+                'initials': 'එන්. එස්. එස්. විජේතුංග',
+                'phone': '0712345613',
+                'qualifications': 'ධර්මාචාර්ය ප්‍රවීණ, BA Hons (Buddhist Studies)',
+            },
+        ]
 
-        # Allocate teacher1 as Class Teacher to 1 ශ්‍රේණිය
+        teacher_objs = {}
+        for t_info in teachers_seed_info:
+            t_user, _ = User.objects.get_or_create(username=t_info['username'])
+            t_user.set_password('teacher123')
+            t_user.first_name = t_info['first_name']
+            t_user.last_name = t_info['last_name']
+            t_user.save()
+
+            UserProfile.objects.update_or_create(
+                user=t_user,
+                defaults={'role': 'TEACHER', 'phone': t_info['phone']}
+            )
+
+            t_profile, _ = Teacher.objects.update_or_create(
+                user=t_user,
+                defaults={
+                    'title': t_info['title'],
+                    'full_name_sinhala': t_info['full_name'],
+                    'name_with_initials': t_info['initials'],
+                    'phone': t_info['phone'],
+                    'whatsapp_phone': t_info['phone'],
+                    'address': 'නො. 45, විහාර මාවත',
+                    'qualifications': t_info['qualifications'],
+                    'date_joined': date(2022, 1, 1),
+                    'is_active': True,
+                }
+            )
+            teacher_objs[t_info['order']] = t_profile
+
+            # Allocate as Class Teacher to respective grade
+            grade_sec = ClassSection.objects.filter(grade_level=grade_objs[t_info['order']], academic_year=academic_year).first()
+            if grade_sec:
+                TeacherAllocation.objects.update_or_create(
+                    teacher=t_profile,
+                    class_section=grade_sec,
+                    subject='බුද්ධ ධර්මය',
+                    defaults={'is_class_teacher': True}
+                )
+
+        teacher_profile = teacher_objs[1]
         grade1_section = ClassSection.objects.get(grade_level=grade_objs[1], academic_year=academic_year)
-        TeacherAllocation.objects.get_or_create(
-            teacher=teacher_profile,
-            class_section=grade1_section,
-            subject='බුද්ධ ධර්මය',
-            defaults={'is_class_teacher': True}
-        )
-        self.stdout.write(self.style.SUCCESS("Allocated teacher1 to Grade 1 section."))
+        self.stdout.write(self.style.SUCCESS(f"Created {len(teacher_objs)} Teacher accounts: teacher1 to teacher{len(teacher_objs)} (Password: teacher123)"))
 
         # 6. Sample Guardian and Students to showcase 1-to-many & teacher-child link
         # Family 1: Regular Guardian with 2 children (Grade 1 & Grade 4)

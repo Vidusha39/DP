@@ -25,15 +25,15 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div class="form-group">
                     <label class="form-label" for="username">පරිශීලක නාමය (Username) <span style="color: red;">*</span></label>
-                    <input type="text" name="username" id="username" class="form-control" required placeholder="උදා: teacher2">
+                    <input type="text" name="username" id="username" class="form-control" required value="{{ suggested_username|default:'teacher14' }}" placeholder="උදා: teacher14">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="password">ආරම්භක මුරපදය (Initial Password) <span style="color: red;">*</span></label>
-                    <input type="password" name="password" id="password" class="form-control" required placeholder="••••••••">
+                    <input type="text" name="password" id="password" class="form-control" required value="{{ default_password|default:'teacher123' }}" placeholder="teacher123">
                 </div>
             </div>
             <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: -0.5rem; margin-bottom: 1rem; line-height: 1.4;">
-                💡 <strong>සටහන:</strong> මෙම ගුරු ගිණුම සාදන ලද පසු, ගුරුභවතාට තම ගිණුමෙන් (Account) ඕනෑම වේලාවක මෙම මුරපදය වෙනස් කරගත හැක (Teachers can change their password from their account).
+                💡 <strong>සටහන:</strong> පහසු භාවිතය සඳහා පෙරනිමි මුරපදය ලෙස <code style="font-weight: bold; color: #2c3e50;">teacher123</code> සකසා ඇත. ගුරුභවතාට තම ගිණුමෙන් (Account) ඕනෑම වේලාවක මෙම මුරපදය වෙනස් කරගත හැක.
             </div>
 
             <div style="background: #fdfaf3; padding: 0.8rem 1rem; border-left: 4px solid var(--accent-gold); margin: 1.5rem 0 1rem 0;">

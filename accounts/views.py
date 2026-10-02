@@ -34,7 +34,8 @@ def login_view(request):
         else:
             messages.error(request, 'පරිශීලක නාමය හෝ මුරපදය වැරදිය. කරුණාකර නැවත උත්සාහ කරන්න.')
 
-    return render(request, 'accounts/login.html')
+    teachers = Teacher.objects.filter(is_active=True, user__isnull=False).select_related('user').prefetch_related('allocations__class_section__grade_level').order_by('user__username')
+    return render(request, 'accounts/login.html', {'teachers': teachers})
 
 
 def logout_view(request):
