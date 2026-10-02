@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}නව ගුරුභවතෙක් ලියාපදිංචිය - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 1.5rem auto;">
+    <div class="card-box" style="border-top: 4px solid var(--primary-color);">
+        <div class="card-header-temple">
+            <div>
+                <h2>නව ගුරුභවතෙක් ලියාපදිංචි කිරීම</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    ප්‍රධානාචාර්යතුමන් හෝ පරිපාලක විසින් නව ආචාර්ය මණ්ඩල සාමාජිකයෙකු එක් කිරීම
+                </p>
+            </div>
+            <a href="{% url 'teacher_list' %}" class="btn btn-sm btn-outline">&larr; ආපසු</a>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="background: #fdfaf3; padding: 0.8rem 1rem; border-left: 4px solid var(--accent-gold); margin-bottom: 1rem;">
+                <h4 style="margin-bottom: 0; color: #8a1414;">පද්ධති පිවිසුම් තොරතුරු (User Account)</h4>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label" for="username">පරිශීලක නාමය (Username) <span style="color: red;">*</span></label>
+                    <input type="text" name="username" id="username" class="form-control" required placeholder="උදා: teacher2">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">ආරම්භක මුරපදය (Initial Password) <span style="color: red;">*</span></label>
+                    <input type="password" name="password" id="password" class="form-control" required placeholder="••••••••">
+                </div>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: -0.5rem; margin-bottom: 1rem; line-height: 1.4;">
+                💡 <strong>සටහන:</strong> මෙම ගුරු ගිණුම සාදන ලද පසු, ගුරුභවතාට තම ගිණුමෙන් (Account) ඕනෑම වේලාවක මෙම මුරපදය වෙනස් කරගත හැක (Teachers can change their password from their account).
+            </div>
+
+            <div style="background: #fdfaf3; padding: 0.8rem 1rem; border-left: 4px solid var(--accent-gold); margin: 1.5rem 0 1rem 0;">
+                <h4 style="margin-bottom: 0; color: #8a1414;">ගුරුභවතාගේ පෞද්ගලික විස්තර</h4>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="title">ගෞරව නාමය <span style="color: red;">*</span></label>
+                <select name="title" id="title" class="form-select">
+                    <option value="VEN">පූජ්‍ය (Venerable)</option>
+                    <option value="MR" selected>ගුරු මයා (Mr.)</option>
+                    <option value="MRS">ගුරු මිය (Mrs.)</option>
+                    <option value="MISS">මෙනවිය (Miss)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="full_name">සම්පූර්ණ නම (සිංහලෙන්) <span style="color: red;">*</span></label>
+                <input type="text" name="full_name" id="full_name" class="form-control" required placeholder="උදා: රත්නායක මුදියන්සේලාගේ නිරෝෂන් බණ්ඩාර">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="name_initials">මුලකුරු සමඟ නම <span style="color: red;">*</span></label>
+                <input type="text" name="name_initials" id="name_initials" class="form-control" required placeholder="උදා: ආර්. එම්. එන්. බණ්ඩාර">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label" for="phone">දුරකථන අංකය <span style="color: red;">*</span></label>
+                    <input type="tel" name="phone" id="phone" class="form-control" required placeholder="07XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="whatsapp">වට්ස්ඇප් (WhatsApp)</label>
+                    <input type="tel" name="whatsapp" id="whatsapp" class="form-control" placeholder="07XXXXXXXX">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="address">ලිපිනය</label>
+                <textarea name="address" id="address" class="form-control" rows="2" placeholder="ස්ථිර ලිපිනය"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="qualifications">සුදුසුකම් (Qualifications)</label>
+                <textarea name="qualifications" id="qualifications" class="form-control" rows="2" placeholder="උදා: ධර්මාචාර්ය විභාගය, උපාධිය, පෙර පාසල් ඩිප්ලෝමාව"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1.05rem; margin-top: 1rem;">
+                💾 ගුරුභවතා පද්ධතියට එක් කරන්න
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

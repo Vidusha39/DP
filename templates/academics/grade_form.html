@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_edit %}ශ්‍රේණිය සංස්කරණය - {{ grade.name }}{% else %}නව ශ්‍රේණියක් එක් කිරීම{% endif %} - සාම දහම් පාසල
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="card-box">
+        <div class="card-header-temple">
+            <div>
+                <h2>{% if is_edit %}✏️ ශ්‍රේණිය සංස්කරණය{% else %}➕ නව ශ්‍රේණියක් ඇතුළත් කිරීම{% endif %}</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    {% if is_edit %}
+                        "{{ grade.name }}" ශ්‍රේණියේ තොරතුරු සහ ස්ථානය සංස්කරණය කරන්න.
+                    {% else %}
+                        දහම් පාසල සඳහා නව ශ්‍රේණියක් සහ එහි ස්ථානය පද්ධතියට එක් කරන්න.
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{% url 'grade_list' %}" class="btn btn-outline btn-sm">⬅️ ආපසු</a>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.name.id_for_label }}">
+                    {{ form.name.label }} <span style="color: var(--danger-red);">*</span>
+                </label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div style="color: var(--danger-red); font-size: 0.85rem; margin-top: 4px;">
+                        {{ form.name.errors.0 }}
+                    </div>
+                {% endif %}
+                <div class="form-help">උදා: 1 ශ්‍රේණිය, ධර්මාචාර්ය, පෙර පාසල</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.english_name.id_for_label }}">
+                        {{ form.english_name.label }}
+                    </label>
+                    {{ form.english_name }}
+                    {% if form.english_name.errors %}
+                        <div style="color: var(--danger-red); font-size: 0.85rem; margin-top: 4px;">
+                            {{ form.english_name.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="form-help">e.g. Grade 1 (විකල්ප)</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.order_index.id_for_label }}">
+                        {{ form.order_index.label }} <span style="color: var(--danger-red);">*</span>
+                    </label>
+                    {{ form.order_index }}
+                    {% if form.order_index.errors %}
+                        <div style="color: var(--danger-red); font-size: 0.85rem; margin-top: 4px;">
+                            {{ form.order_index.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <div class="form-help">ලැයිස්තුවේ දිස්වන අනුපිළිවෙල (1, 2, 3...)</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.classroom.id_for_label }}">
+                    {{ form.classroom.label }}
+                </label>
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        {{ form.classroom }}
+                    </div>
+                    <a href="{% url 'allocate_grade_location' %}" class="btn btn-outline btn-sm" title="නව ශාලාවක් එක් කිරීමට හෝ ස්ථාන කළමනාකරණයට">
+                        🏛️ ස්ථාන කළමනාකරණය
+                    </a>
+                </div>
+                {% if form.classroom.errors %}
+                    <div style="color: var(--danger-red); font-size: 0.85rem; margin-top: 4px;">
+                        {{ form.classroom.errors.0 }}
+                    </div>
+                {% endif %}
+                <div class="form-help">මෙම ශ්‍රේණිය සඳහා පන්ති පැවැත්වෙන ශාලාව හෝ ස්ථානය තෝරන්න (වත්මන් වර්ෂය: {{ current_year.year }}).</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.description.id_for_label }}">
+                    {{ form.description.label }}
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div style="color: var(--danger-red); font-size: 0.85rem; margin-top: 4px;">
+                        {{ form.description.errors.0 }}
+                    </div>
+                {% endif %}
+                <div class="form-help">අවශ්‍ය නම් පමණක් කෙටි විස්තරයක් ඇතුළත් කරන්න.</div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+                <a href="{% url 'grade_list' %}" class="btn btn-outline">අවලංගු කරන්න</a>
+                <button type="submit" class="btn btn-primary">
+                    {% if is_edit %}💾 වෙනස්කම් සුරකින්න{% else %}➕ ශ්‍රේණිය එක් කරන්න{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

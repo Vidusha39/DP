@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}නව ශිෂ්‍ය ලියාපදිංචිය - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 1rem auto;">
+    <div class="card-box" style="border-top: 4px solid var(--accent-gold);">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="font-size: 2.5rem;">📝</div>
+            <h2 style="margin-top: 0.3rem;">නව ශිෂ්‍ය ලියාපදිංචි අයදුම්පත</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                කරුණාකර පහත තොරතුරු නිවැරදිව සිංහලෙන් සම්පූර්ණ කරන්න.<br>
+                <small style="color: #e67e22;">* ඉදිරිපත් කිරීමෙන් පසු පන්තිභාර ගුරුභවතා හෝ ප්‍රධානාචාර්යතුමන් විසින් තහවුරු කරනු ලැබේ.</small>
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- SECTION 1: ශිෂ්‍ය තොරතුරු -->
+            <div style="background: #fdfaf3; border-left: 4px solid var(--accent-gold); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1.25rem;">
+                <h3 style="font-size: 1.15rem; color: #8a1414; margin-bottom: 0;">1. ශිෂ්‍යයාගේ විස්තර (Student Details)</h3>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.full_name_sinhala.id_for_label }}">{{ form.full_name_sinhala.label }} <span style="color: red;">*</span></label>
+                {{ form.full_name_sinhala }}
+                {% if form.full_name_sinhala.errors %}<div style="color: red; font-size: 0.85rem;">{{ form.full_name_sinhala.errors }}</div>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.name_with_initials_sinhala.id_for_label }}">{{ form.name_with_initials_sinhala.label }} <span style="color: red;">*</span></label>
+                {{ form.name_with_initials_sinhala }}
+                {% if form.name_with_initials_sinhala.errors %}<div style="color: red; font-size: 0.85rem;">{{ form.name_with_initials_sinhala.errors }}</div>{% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.dob.id_for_label }}">{{ form.dob.label }} <span style="color: red;">*</span></label>
+                    {{ form.dob }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.gender.id_for_label }}">{{ form.gender.label }} <span style="color: red;">*</span></label>
+                    {{ form.gender }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.applied_grade.id_for_label }}">{{ form.applied_grade.label }} <span style="color: red;">*</span></label>
+                {{ form.applied_grade }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.medical_notes.id_for_label }}">{{ form.medical_notes.label }}</label>
+                {{ form.medical_notes }}
+                <div class="form-help">දරුවාට විශේෂ සෞඛ්‍ය ගැටළු හෝ ආසාත්මිකතා ඇත්නම් පමණක් සටහන් කරන්න.</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.special_notes.id_for_label }}">{{ form.special_notes.label }}</label>
+                {{ form.special_notes }}
+            </div>
+
+            <!-- SECTION 2: දෙමාපිය / භාරකරුගේ තොරතුරු -->
+            <div style="background: #fdfaf3; border-left: 4px solid var(--accent-gold); padding: 0.75rem 1rem; border-radius: 4px; margin: 2rem 0 1.25rem 0;">
+                <h3 style="font-size: 1.15rem; color: #8a1414; margin-bottom: 0;">2. දෙමාපිය / භාරකරුගේ විස්තර (Parent / Guardian)</h3>
+            </div>
+
+            <!-- Optional Teacher Child normalization checkbox -->
+            <div style="background: #eef9f2; border: 1px solid #c3e6cb; padding: 0.85rem 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+                <div class="form-check" style="display: flex; align-items: center; gap: 8px;">
+                    {{ form.is_teacher_child }}
+                    <label class="form-label" for="isTeacherCheckbox" style="margin-bottom: 0; cursor: pointer;">
+                        <strong>මම / භාරකරු මෙම දහම් පාසලේ ආචාර්ය මණ්ඩලයේ ගුරුභවතෙකි</strong>
+                    </label>
+                </div>
+                <div id="teacherSelectContainer" style="display: none; margin-top: 0.75rem;">
+                    <label class="form-label" for="{{ form.linked_teacher.id_for_label }}">ගුරුභවතා තෝරන්න (Select Teacher):</label>
+                    {{ form.linked_teacher }}
+                    <div class="form-help">ගුරුභවතා තෝරාගත් පසු ලිපිනය සහ දුරකථන විස්තර ස්වයංක්‍රීයව පද්ධතියට සම්බන්ධ වේ.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.guardian_name.id_for_label }}">{{ form.guardian_name.label }} <span style="color: red;">*</span></label>
+                {{ form.guardian_name }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.relationship_to_guardian.id_for_label }}">{{ form.relationship_to_guardian.label }} <span style="color: red;">*</span></label>
+                {{ form.relationship_to_guardian }}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.guardian_phone.id_for_label }}">{{ form.guardian_phone.label }} <span style="color: red;">*</span></label>
+                    {{ form.guardian_phone }}
+                    <div class="form-help">පෙර දරුවන් ලියාපදිංචි කළ අංකයම ඇතුළත් කළ හැකිය.</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="{{ form.guardian_whatsapp.id_for_label }}">{{ form.guardian_whatsapp.label }}</label>
+                    {{ form.guardian_whatsapp }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.guardian_address.id_for_label }}">{{ form.guardian_address.label }} <span style="color: red;">*</span></label>
+                {{ form.guardian_address }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="{{ form.guardian_occupation.id_for_label }}">{{ form.guardian_occupation.label }}</label>
+                {{ form.guardian_occupation }}
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1.15rem; margin-top: 1.5rem;">
+                💾 අයදුම්පත ඉදිරිපත් කරන්න (Submit)
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

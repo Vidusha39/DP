@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}පැමිණීම සටහන් කිරීම - {{ class_section.grade_level.name }}{% endblock %}
+
+{% block content %}
+<div class="card-box" style="border-top: 4px solid var(--primary-color); margin-bottom: 1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+            <h2>📋 ඉරිදා පැමිණීම සටහන් කිරීම</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                පන්තිය: <strong style="color: var(--primary-color);">🌸 {{ class_section.grade_level.name }}</strong> | 
+                මුළු සිසුන්: <strong>{{ total_students }}</strong>
+            </p>
+        </div>
+
+        <!-- Date selector form -->
+        <form method="get" style="display: flex; align-items: center; gap: 8px;">
+            <label for="date" style="font-weight: 600; font-size: 0.9rem;">දිනය:</label>
+            <input 
+                type="date" 
+                name="date" 
+                id="date" 
+                value="{{ selected_date|date:'Y-m-d' }}" 
+                class="form-control" 
+                style="padding: 0.4rem 0.6rem; width: auto;"
+                onchange="this.form.submit()"
+            >
+        </form>
+    </div>
+</div>
+
+<!-- Mobile Quick Action: Mark All Present -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px;">
+    <button type="button" id="markAllPresentBtn" class="btn btn-gold" style="font-size: 0.95rem; font-weight: 700;">
+        ⚡ සියල්ලන් පැමිණි (Present) ලෙස ලකුණු කරන්න
+    </button>
+    <div style="font-size: 0.85rem; color: var(--text-muted);">
+        * බොත්තම ඔබා නොපැමිණි සිසුන් පමණක් රතු පැහැයෙන් වෙනස් කරන්න.
+    </div>
+</div>
+
+<!-- Attendance Form with Sticky Bottom Save Bar -->
+<form method="post" id="attendanceForm">
+    {% csrf_token %}
+
+    <div style="margin-bottom: 5rem;">
+        {% for item in students_with_status %}
+        <div class="student-attendance-card">
+            <div class="student-info-meta">
+                <div class="student-name-text">
+                    <span class="student-adm-badge">{{ item.student.admission_number|default:"-" }}</span>
+                    {{ item.student.name_with_initials_sinhala }}
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 2px;">
+                    භාරකරු: {{ item.student.guardian.full_name_sinhala }} ({{ item.student.guardian.primary_phone }})
+                </div>
+            </div>
+
+            <!-- Touch Toggle Buttons -->
+            <div class="attendance-toggle-group">
+                <input 
+                    type="radio" 
+                    name="status_{{ item.student.id }}" 
+                    id="pres_{{ item.student.id }}" 
+                    value="PRESENT" 
+                    {% if item.status == 'PRESENT' %}checked{% endif %}
+                    style="display: none;"
+                >
+                <label for="pres_{{ item.student.id }}" class="toggle-btn toggle-present {% if item.status == 'PRESENT' %}active{% endif %}">
+                    ✓ පැමිණි
+                </label>
+
+                <input 
+                    type="radio" 
+                    name="status_{{ item.student.id }}" 
+                    id="abs_{{ item.student.id }}" 
+                    value="ABSENT" 
+                    {% if item.status == 'ABSENT' %}checked{% endif %}
+                    style="display: none;"
+                >
+                <label for="abs_{{ item.student.id }}" class="toggle-btn toggle-absent {% if item.status == 'ABSENT' %}active{% endif %}">
+                    ✕ නොපැමිණි
+                </label>
+
+                <input 
+                    type="radio" 
+                    name="status_{{ item.student.id }}" 
+                    id="exc_{{ item.student.id }}" 
+                    value="EXCUSED" 
+                    {% if item.status == 'EXCUSED' %}checked{% endif %}
+                    style="display: none;"
+                >
+                <label for="exc_{{ item.student.id }}" class="toggle-btn toggle-excused {% if item.status == 'EXCUSED' %}active{% endif %}">
+                    – නිවාඩු
+                </label>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card-box" style="text-align: center; padding: 2.5rem; color: var(--text-muted);">
+            මෙම පන්තිය සඳහා තවම සිසුන් ලියාපදිංචි වී නොමැත.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Sticky Bottom Bar for Mobile Convenience -->
+    {% if students_with_status %}
+    <div class="sticky-bottom-bar">
+        <div>
+            <span style="font-size: 0.95rem; font-weight: 600;">දිනය: {{ selected_date|date:"Y-m-d" }}</span><br>
+            <small style="color: var(--text-muted);">සිසුන් {{ total_students }} දෙනෙක්</small>
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.8rem; font-size: 1.05rem; font-weight: 700;">
+            💾 පැමිණීම සුරකින්න (Save)
+        </button>
+    </div>
+    {% endif %}
+</form>
+{% endblock %}

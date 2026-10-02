@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="si">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}සාම දහම් පාසල{% endblock %} - ශිෂ්‍ය හා ගුරු කළමනාකරණ පද්ධතිය</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☸</text></svg>">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navbar -->
+    <header class="navbar-temple">
+        <div class="navbar-container">
+            <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}"
+                class="brand-link">
+                <div class="brand-emblem">☸</div>
+                <div>
+                    <div class="brand-title">දහම් පාසල</div>
+                    <div class="brand-subtitle">ශිෂ්‍ය ලියාපදිංචි හා ගුරු අනුයුක්ත පද්ධතිය</div>
+                </div>
+            </a>
+
+            <nav class="nav-actions">
+                {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="nav-link">පාලක පුවරුව</a>
+
+                {% if is_staff_or_admin %}
+                <a href="{% url 'student_list' %}" class="nav-link">සිසුන්</a>
+                <a href="{% url 'pending_verifications' %}" class="nav-link">අනුමැතීන්</a>
+                <a href="{% url 'grade_list' %}" class="nav-link">ශ්‍රේණි & ස්ථාන</a>
+                <a href="{% url 'teacher_list' %}" class="nav-link">ගුරුවරුන්</a>
+                <a href="{% url 'allocate_teacher' %}" class="nav-link">අනුයුක්ත කිරීම්</a>
+                <a href="{% url 'attendance_overview' %}" class="nav-link">පැමිණීම</a>
+                {% elif is_teacher %}
+                <a href="{% url 'student_list' %}" class="nav-link">මගේ පන්තිය</a>
+                <a href="{% url 'pending_verifications' %}" class="nav-link">අනුමැතීන්</a>
+                <a href="{% url 'attendance_overview' %}" class="nav-link">පැමිණීම</a>
+                {% endif %}
+
+                <span class="badge-role" title="පිවිස සිටින ගිණුම: {{ user.username }}">
+                    {% if is_admin %}පරිපාලක (Admin){% elif is_principal %}ප්‍රධානාචාර්ය{% else %}ගුරුභවතා{% endif %}
+                </span>
+                <a href="{% url 'change_password' %}" class="btn btn-sm btn-outline"
+                    style="color: #fff; border-color: rgba(255,255,255,0.4);" title="මුරපදය වෙනස් කිරීම">🔑 මුරපදය</a>
+                <a href="{% url 'logout' %}" class="btn btn-sm btn-outline"
+                    style="color: #fff; border-color: rgba(255,255,255,0.4);">ඉවත් වන්න</a>
+                {% else %}
+                <a href="{% url 'home' %}" class="nav-link">මුල් පිටුව</a>
+                <a href="{% url 'public_register' %}" class="btn btn-sm btn-gold">සිසු ලියාපදිංචිය</a>
+                <a href="{% url 'login' %}" class="btn btn-sm btn-outline"
+                    style="color: #fff; border-color: rgba(255,255,255,0.4);">ඇතුල් වන්න</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+        <!-- Messages -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert-box alert-{{ message.tags }}">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer
+        style="text-align: center; padding: 1.5rem; color: #7f8c8d; font-size: 0.9rem; border-top: 1px solid #e2e8f0; margin-top: 2rem;">
+        <p>දහම් පාසල් කළමනාකරණ පද්ධතිය &copy; 2026 | සියලු හිමිකම් ඇවිරිණි</p>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

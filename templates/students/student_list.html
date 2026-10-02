@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}ශිෂ්‍ය නාමාවලිය - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple">
+    <div>
+        <h2>ශිෂ්‍ය නාමාවලිය (Students Directory)</h2>
+        <p style="color: var(--text-muted);">දහම් පාසලේ ලියාපදිංචි සියලුම සිසුන්ගේ තොරතුරු</p>
+    </div>
+    <a href="{% url 'public_register' %}" class="btn btn-sm btn-primary">➕ නව ශිෂ්‍ය ලියාපදිංචිය</a>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card-box" style="padding: 1rem;">
+    <form method="get" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 2; min-width: 200px;">
+            <input 
+                type="text" 
+                name="q" 
+                value="{{ query }}" 
+                class="form-control" 
+                placeholder="🔍 නම, ඇතුළත් වීමේ අංකය හෝ දුරකථන අංකය සොයන්න..."
+            >
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+            <select name="grade" class="form-select">
+                <option value="">සියලු ශ්‍රේණි (All Grades)</option>
+                {% for g in grades %}
+                    <option value="{{ g.id }}" {% if selected_grade == g.id|stringformat:'i' %}selected{% endif %}>{{ g.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="flex: 1; min-width: 140px;">
+            <select name="status" class="form-select">
+                <option value="APPROVED" {% if selected_status == 'APPROVED' %}selected{% endif %}>අනුමත කළ (Active)</option>
+                <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>අනුමැතිය අපේක්ෂිත</option>
+                <option value="" {% if not selected_status %}selected{% endif %}>සියලු තත්ත්ව (All)</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-gold">සොයන්න</button>
+        {% if query or selected_grade or selected_status %}
+            <a href="{% url 'student_list' %}" class="btn btn-outline">ඉවත් කරන්න</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Students Table -->
+<div class="card-box">
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th>ඇතුළත් වීමේ අංකය</th>
+                    <th>ශිෂ්‍යයාගේ නම</th>
+                    <th>ශ්‍රේණිය</th>
+                    <th>ස්ත්‍රී / පුරුෂ</th>
+                    <th>භාරකරුගේ නම</th>
+                    <th>දුරකථන අංකය</th>
+                    <th>තත්ත්වය</th>
+                    <th>විස්තර</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td><strong>{{ student.admission_number|default:"-" }}</strong></td>
+                    <td>
+                        <strong style="color: #2c3e50;">{{ student.name_with_initials_sinhala }}</strong><br>
+                        <small style="color: var(--text-muted);">{{ student.full_name_sinhala }}</small>
+                    </td>
+                    <td>🌸 {{ student.applied_grade.name }}</td>
+                    <td>{{ student.get_gender_display }}</td>
+                    <td>{{ student.guardian.full_name_sinhala }}</td>
+                    <td>
+                        <a href="tel:{{ student.guardian.primary_phone }}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                            📞 {{ student.guardian.primary_phone }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if student.status == 'APPROVED' %}
+                            <span class="status-pill status-approved">ක්‍රියාකාරී</span>
+                        {% elif student.status == 'PENDING' %}
+                            <span class="status-pill status-pending">අනුමැතිය අපේක්ෂිත</span>
+                        {% else %}
+                            <span class="status-pill status-rejected">{{ student.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'student_detail' student.id %}" class="btn btn-sm btn-outline">බලන්න</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                        සිසුන් කිසිවෙකු සොයාගත නොහැකි විය.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

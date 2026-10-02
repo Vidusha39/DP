@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ class_section.grade_level.name }} - නාම ලේඛනය</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            background-color: #fff;
+            padding: 20px;
+            color: #000;
+        }
+        .print-container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+        .print-header {
+            text-align: center;
+            border-bottom: 2px double #000;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .print-header h1 {
+            color: #000;
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+        .print-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+        .print-table th, .print-table td {
+            border: 1px solid #000;
+            padding: 6px 8px;
+        }
+        .print-table th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding: 0 40px;
+        }
+        .signature-box {
+            text-align: center;
+            border-top: 1px dashed #000;
+            width: 220px;
+            padding-top: 6px;
+            font-weight: 600;
+        }
+        .no-print-bar {
+            background: #f1f2f6;
+            padding: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            border-radius: 6px;
+        }
+        @media print {
+            .no-print-bar {
+                display: none;
+            }
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="print-container">
+        <div class="no-print-bar">
+            <span>🖨️ <strong>මුද්‍රණ පූර්වදර්ශනය (Print Preview)</strong></span>
+            <div>
+                <button onclick="window.print()" class="btn btn-primary btn-sm">මුද්‍රණය කරන්න (Print / Save as PDF)</button>
+                <button onclick="window.close()" class="btn btn-outline btn-sm">වසන්න</button>
+            </div>
+        </div>
+
+        <div class="print-header">
+            <div style="font-size: 2rem;">☸</div>
+            <h1>දහම් පාසල</h1>
+            <h2 style="font-size: 1.25rem; font-weight: normal; margin-top: 2px;">
+                ශිෂ්‍ය නාම ලේඛනය සහ ඉරිදා පැමිණීමේ ලේඛනය - {{ class_section.academic_year.year }}
+            </h2>
+            <div style="font-size: 0.95rem; margin-top: 6px;">
+                <strong>ශ්‍රේණිය:</strong> {{ class_section.grade_level.name }} | 
+                <strong>ශාලාව:</strong> {{ class_section.classroom.name|default:"වෙන් කර නැත" }} | 
+                <strong>මුළු සිසුන්:</strong> {{ students.count }} දෙනෙක් | 
+                <strong>දිනය:</strong> {{ print_date|date:"Y-m-d" }}
+            </div>
+        </div>
+
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">අනු අංකය</th>
+                    <th style="width: 90px;">ඇතුළත් වීමේ අංකය</th>
+                    <th>ශිෂ්‍යයාගේ සම්පූර්ණ නම</th>
+                    <th style="width: 60px;">ස්ත්‍රී/පුරුෂ</th>
+                    <th style="width: 100px;">දුරකථනය</th>
+                    <th style="width: 50px;">.../...</th>
+                    <th style="width: 50px;">.../...</th>
+                    <th style="width: 50px;">.../...</th>
+                    <th style="width: 50px;">.../...</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td style="text-align: center;">{{ forloop.counter }}</td>
+                    <td style="text-align: center; font-weight: bold;">{{ student.admission_number|default:"-" }}</td>
+                    <td>{{ student.name_with_initials_sinhala }}</td>
+                    <td style="text-align: center;">{{ student.get_gender_display|slice:":1" }}</td>
+                    <td style="text-align: center;">{{ student.guardian.primary_phone }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 20px;">සිසුන් නොමැත.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="signature-row">
+            <div class="signature-box">
+                පන්තිභාර ආචාර්යතුමන්ගේ අත්සන
+            </div>
+            <div class="signature-box">
+                ප්‍රධානාචාර්ය ස්වාමීන්වහන්සේගේ අත්සන
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}ගුරු අනුයුක්ත කිරීම් - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple">
+    <div>
+        <h2>පන්ති සඳහා ගුරු භවතුන් අනුයුක්ත කිරීම</h2>
+        <p style="color: var(--text-muted);">
+            අධ්‍යයන වර්ෂය: {% if current_year %}{{ current_year.year }}{% else %}2026{% endif %} සඳහා පන්තිභාර හා විෂයභාර ගුරුවරුන් පත් කිරීම
+        </p>
+    </div>
+    <a href="{% url 'teacher_list' %}" class="btn btn-sm btn-outline">&larr; ගුරු නාමාවලිය</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 1.5rem; flex-wrap: wrap;">
+    <!-- Left Column: Allocation Form -->
+    <div>
+        <div class="card-box" style="border-top: 4px solid var(--accent-gold);">
+            <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">නව අනුයුක්තයක් සිදු කරන්න</h3>
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label" for="teacher_id">ගුරුභවතා තෝරන්න <span style="color: red;">*</span></label>
+                    <select name="teacher_id" id="teacher_id" class="form-select" required>
+                        <option value="">-- ගුරුභවතා තෝරන්න --</option>
+                        {% for t in teachers %}
+                            <option value="{{ t.id }}">{{ t.display_name }} ({{ t.phone }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="class_section_id">ශ්‍රේණිය / පන්තිය තෝරන්න <span style="color: red;">*</span></label>
+                    <select name="class_section_id" id="class_section_id" class="form-select" required>
+                        <option value="">-- පන්තිය තෝරන්න --</option>
+                        {% for cs in class_sections %}
+                            <option value="{{ cs.id }}">🌸 {{ cs.grade_level.name }} - {{ cs.section_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="subject">විෂයය (Subject) <span style="color: red;">*</span></label>
+                    <input type="text" name="subject" id="subject" class="form-control" required value="බුද්ධ ධර්මය" placeholder="උදා: බුද්ධ ධර්මය, පාලි, බෞද්ධ ඉතිහාසය, අභිධර්මය">
+                </div>
+
+                <div class="form-group" style="background: #fdfaf3; padding: 0.75rem; border-radius: 6px; border: 1px solid #fae5b9;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="is_class_teacher" id="is_class_teacher" class="form-check-input" checked>
+                        <label class="form-label" for="is_class_teacher" style="margin-bottom: 0; cursor: pointer;">
+                            <strong>ප්‍රධාන පන්තිභාර ගුරුභවතා ලෙස පත් කරන්න</strong>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem;">
+                    📌 අනුයුක්තය සුරකින්න
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right Column: Current Allocations Table -->
+    <div>
+        <div class="card-box">
+            <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">වත්මන් පන්ති අනුයුක්ත කිරීම්</h3>
+            <div class="responsive-table-wrapper">
+                <table class="temple-table">
+                    <thead>
+                        <tr>
+                            <th>ශ්‍රේණිය</th>
+                            <th>ගුරුභවතා</th>
+                            <th>විෂයය</th>
+                            <th>තත්ත්වය</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alloc in existing_allocations %}
+                        <tr>
+                            <td><strong>🌸 {{ alloc.class_section.grade_level.name }}</strong></td>
+                            <td>{{ alloc.teacher.display_name }}</td>
+                            <td>{{ alloc.subject }}</td>
+                            <td>
+                                {% if alloc.is_class_teacher %}
+                                    <span class="status-pill status-approved">පන්තිභාර</span>
+                                {% else %}
+                                    <span class="status-pill status-pending">විෂයභාර</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                                තවම ගුරු අනුයුක්ත කිරීම් සිදු කර නොමැත.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

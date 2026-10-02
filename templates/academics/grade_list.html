@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}ශ්‍රේණි සහ ස්ථාන කළමනාකරණය - සාම දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple" style="border-bottom: none; margin-bottom: 0.5rem;">
+    <div>
+        <h2>📚 ශ්‍රේණි සහ ස්ථාන කළමනාකරණය</h2>
+        <p style="color: var(--text-muted);">
+            දහම් පාසලේ ශ්‍රේණි නිර්මාණය කිරීම, සංස්කරණය, මකා දැමීම සහ පන්ති ශාලා අනුයුක්ත කිරීම.
+        </p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="{% url 'grade_create' %}" class="btn btn-primary btn-sm">
+            ➕ නව ශ්‍රේණියක් එක් කරන්න
+        </a>
+        <a href="{% url 'allocate_grade_location' %}" class="btn btn-gold btn-sm">
+            🏛️ ස්ථාන අනුයුක්ත කිරීම
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm">
+            ⬅️ පාලක පුවරුව
+        </a>
+    </div>
+</div>
+
+<!-- Metrics Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-val">{{ total_grades }}</div>
+        <div class="stat-label">සම්පූර්ණ ශ්‍රේණි ගණන (Grades)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-val">{{ total_classrooms }}</div>
+        <div class="stat-label">පවතින ශාලා / කාමර (Locations)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-val">{{ current_year.year|default:"2026" }}</div>
+        <div class="stat-label">වත්මන් අධ්‍යයන වර්ෂය</div>
+    </div>
+</div>
+
+<!-- Grades Table -->
+<div class="card-box">
+    <div class="card-header-temple">
+        <h3>පවතින ශ්‍රේණි ලැයිස්තුව</h3>
+        <a href="{% url 'grade_create' %}" class="btn btn-sm btn-primary">➕ නව ශ්‍රේණියක්</a>
+    </div>
+
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th style="width: 60px; text-align: center;">අංකය</th>
+                    <th>ශ්‍රේණියේ නම (සිංහල / English)</th>
+                    <th>අනුයුක්ත ස්ථානය / ශාලාව</th>
+                    <th style="text-align: center;">සක්‍රීය සිසුන්</th>
+                    <th style="text-align: center;">අනුමැතීන්</th>
+                    <th>පන්තිභාර ගුරුභවතා</th>
+                    <th style="text-align: right;">ක්‍රියාකාරකම්</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in grade_summaries %}
+                <tr>
+                    <td style="text-align: center; font-weight: 700; color: var(--primary-color);">
+                        #{{ item.grade.order_index }}
+                    </td>
+                    <td>
+                        <strong style="font-size: 1.05rem;">{{ item.grade.name }}</strong>
+                        {% if item.grade.english_name %}
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">{{ item.grade.english_name }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.classroom %}
+                            <span style="display: inline-flex; align-items: center; gap: 4px; font-weight: 500;">
+                                🏛️ {{ item.classroom.name }}
+                                <small style="color: var(--text-muted); font-size: 0.8rem;">(ධාරිතාව: {{ item.classroom.capacity }})</small>
+                            </span>
+                        {% else %}
+                            <span style="color: #e67e22; font-size: 0.85rem;">[ස්ථානයක් වෙන් කර නැත]</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="status-pill status-approved" style="font-size: 0.85rem;">
+                            {{ item.student_count }} දෙනෙක්
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        {% if item.pending_count > 0 %}
+                            <span class="status-pill status-pending" style="font-size: 0.85rem;">
+                                {{ item.pending_count }}
+                            </span>
+                        {% else %}
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.class_teacher %}
+                            <span style="color: var(--primary-color); font-weight: 500;">
+                                👤 {{ item.class_teacher.display_name }}
+                            </span>
+                        {% else %}
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">නැත</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                        <div style="display: inline-flex; gap: 6px;">
+                            <a href="{% url 'grade_edit' item.grade.id %}" class="btn btn-sm btn-outline" title="සංස්කරණය">
+                                ✏️ සංස්කරණය
+                            </a>
+                            <a href="{% url 'grade_delete' item.grade.id %}" class="btn btn-sm btn-outline" style="color: var(--danger-red); border-color: #fbd5d5;" title="මකා දමන්න">
+                                🗑️ මකන්න
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        තවමත් කිසිදු ශ්‍රේණියක් පද්ධතියට ඇතුළත් කර නොමැත. කරුණාකර "නව ශ්‍රේණියක් එක් කරන්න" බොත්තම ක්ලික් කරන්න.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}පද්ධතියට ඇතුල් වීම - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 460px; margin: 2rem auto;">
+    <div class="card-box" style="border-top: 4px solid var(--primary-color);">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <div style="font-size: 2.5rem; color: var(--accent-gold);">☸</div>
+            <h2 style="margin-top: 0.5rem; font-size: 1.5rem;">පද්ධති ප්‍රවේශය</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">පරිපාලක, ප්‍රධානාචාර්ය හෝ ආචාර්ය මණ්ඩලය සඳහා</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label" for="username">පරිශීලක නාමය (Username)</label>
+                <input type="text" name="username" id="username" class="form-control" required autofocus placeholder="උදා: admin හෝ teacher1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">මුරපදය (Password)</label>
+                <input type="password" name="password" id="password" class="form-control" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="padding: 0.8rem; font-size: 1.05rem;">
+                ඇතුල් වන්න (Log In)
+            </button>
+        </form>
+
+        <!-- Test Account Quick Fill Helper -->
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); font-size: 0.85rem; color: var(--text-muted);">
+            <div style="font-weight: 600; margin-bottom: 0.4rem; color: #2c3e50;">පරීක්ෂණ ගිණුම් (Test Logins):</div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div>👑 <strong>Admin</strong>: <code>admin</code> / <code>admin123</code></div>
+                <div>🏛 <strong>Principal</strong>: <code>principal</code> / <code>principal123</code></div>
+                <div>📖 <strong>Teacher</strong>: <code>teacher1</code> / <code>teacher123</code></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

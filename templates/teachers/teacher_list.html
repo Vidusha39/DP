@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}ආචාර්ය මණ්ඩලය - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple">
+    <div>
+        <h2>ආචාර්ය මණ්ඩලය (Teachers Directory)</h2>
+        <p style="color: var(--text-muted);">දහම් පාසලේ සියලුම ගුරුභවතුන් සහ ඔවුන්ගේ අනුයුක්ත පන්ති</p>
+    </div>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'create_teacher' %}" class="btn btn-primary btn-sm">➕ නව ගුරුභවතෙක් ලියාපදිංචිය</a>
+        <a href="{% url 'allocate_teacher' %}" class="btn btn-gold btn-sm">📌 පන්ති අනුයුක්ත කරන්න</a>
+    </div>
+</div>
+
+<div class="card-box">
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th>ගුරුභවතාගේ නම</th>
+                    <th>දුරකථන අංකය</th>
+                    <th>වට්ස්ඇප් (WhatsApp)</th>
+                    <th>සුදුසුකම්</th>
+                    <th>අනුයුක්ත පන්ති සහ විෂයයන්</th>
+                    <th>ක්‍රියාකාරී</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in teachers %}
+                <tr>
+                    <td>
+                        <strong style="color: var(--primary-color); font-size: 1.05rem;">
+                            {{ teacher.display_name }}
+                        </strong><br>
+                        <small style="color: var(--text-muted);">{{ teacher.full_name_sinhala }}</small>
+                    </td>
+                    <td>
+                        <a href="tel:{{ teacher.phone }}" style="color: inherit; text-decoration: none;">
+                            📞 {{ teacher.phone }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if teacher.whatsapp_phone %}
+                            <a href="https://wa.me/{{ teacher.whatsapp_phone }}" target="_blank" style="color: #27ae60; text-decoration: none; font-weight: 600;">
+                                💬 {{ teacher.whatsapp_phone }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td style="font-size: 0.85rem; max-width: 220px;">{{ teacher.qualifications|default:"-" }}</td>
+                    <td>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            {% for alloc in teacher.allocations.all %}
+                                <span style="background: #f1f2f6; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">
+                                    🌸 <strong>{{ alloc.class_section.grade_level.name }}</strong> [{{ alloc.subject }}]
+                                    {% if alloc.is_class_teacher %}
+                                        <small style="color: #27ae60; font-weight: bold;">(පන්තිභාර)</small>
+                                    {% endif %}
+                                </span>
+                            {% empty %}
+                                <span style="color: #e74c3c; font-size: 0.85rem;">පන්තියක් අනුයුක්ත කර නැත</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if teacher.is_active %}
+                            <span class="status-pill status-approved">ක්‍රියාකාරී</span>
+                        {% else %}
+                            <span class="status-pill status-rejected">අක්‍රිය</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                        තවම ගුරුභවතුන් ලියාපදිංචි කර නොමැත.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

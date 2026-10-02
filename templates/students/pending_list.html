@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}අනුමැතිය අපේක්ෂිත ශිෂ්‍ය අයදුම්පත් - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple">
+    <div>
+        <h2>අනුමැතිය අපේක්ෂිත ශිෂ්‍ය අයදුම්පත්</h2>
+        <p style="color: var(--text-muted);">
+            දෙමාපියන් විසින් ජංගම දුරකථනයෙන් ඉදිරිපත් කළ නව අයදුම්පත් පරීක්ෂා කර ඇතුළත් වීමේ අංකය ලබා දී අනුමත කරන්න.
+        </p>
+    </div>
+    <div style="font-size: 0.95rem;">
+        <span class="status-pill status-pending" style="font-size: 0.95rem; padding: 0.4rem 0.8rem;">
+            මුළු අයදුම්පත්: {{ pending_students.count }}
+        </span>
+    </div>
+</div>
+
+<!-- Grade Filter Tabs -->
+<div style="margin-bottom: 1.25rem; display: flex; gap: 6px; flex-wrap: wrap;">
+    <a href="{% url 'pending_verifications' %}" class="btn btn-sm {% if not selected_grade %}btn-primary{% else %}btn-outline{% endif %}">
+        සියල්ල (All)
+    </a>
+    {% for g in grades %}
+        <a href="{% url 'pending_verifications' %}?grade={{ g.id }}" class="btn btn-sm {% if selected_grade == g.id|stringformat:'i' %}btn-primary{% else %}btn-outline{% endif %}">
+            {{ g.name }}
+        </a>
+    {% endfor %}
+</div>
+
+<!-- Pending Cards / Table -->
+<div class="card-box">
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th>ශිෂ්‍යයාගේ නම</th>
+                    <th>ඉල්ලුම් කළ ශ්‍රේණිය</th>
+                    <th>උපන් දිනය / වයස</th>
+                    <th>භාරකරුගේ නම සහ දුරකථනය</th>
+                    <th>ලිපිනය</th>
+                    <th>දිනය</th>
+                    <th>ක්‍රියාමාර්ග</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in pending_students %}
+                <tr>
+                    <td>
+                        <strong style="font-size: 1.05rem; color: #2c3e50;">{{ student.name_with_initials_sinhala }}</strong><br>
+                        <small style="color: var(--text-muted);">{{ student.full_name_sinhala }}</small>
+                    </td>
+                    <td>
+                        <span class="status-pill status-approved">
+                            🌸 {{ student.applied_grade.name }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ student.dob|date:"Y-m-d" }}<br>
+                        <small style="color: var(--text-muted); font-weight: 600;">(වයස {{ student.age }} යි)</small>
+                    </td>
+                    <td>
+                        <strong>{{ student.guardian.full_name_sinhala }}</strong><br>
+                        <a href="tel:{{ student.guardian.primary_phone }}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                            📞 {{ student.guardian.primary_phone }}
+                        </a>
+                        {% if student.guardian.linked_teacher %}
+                            <br><small style="color: #27ae60; font-weight: 600;">(ගුරු දරුවෙකි)</small>
+                        {% endif %}
+                    </td>
+                    <td style="max-width: 200px; font-size: 0.85rem;">{{ student.guardian.address }}</td>
+                    <td style="font-size: 0.85rem; color: var(--text-muted);">{{ student.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'verify_student' student.id %}" class="btn btn-sm btn-gold" style="font-weight: 700; white-space: nowrap;">
+                            ✓ තහවුරු කරන්න
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎉</div>
+                        <strong>මෙම ශ්‍රේණිය සඳහා අනුමත කිරීමට කිසිදු නව අයදුම්පතක් නොමැත.</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

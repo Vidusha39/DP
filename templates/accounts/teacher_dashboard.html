@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}ගුරු පාලක පුවරුව - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-box" style="border-left: 5px solid var(--accent-gold); padding: 1.25rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+            <h2>සාදරයෙන් පිළිගනිමු, {{ teacher.display_name|default:user.username }}</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+                දහම් පාසල් ආචාර්ය මණ්ඩලය | අධ්‍යයන වර්ෂය: {% if current_year %}{{ current_year.year }}{% else %}2026{% endif %}
+            </p>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span class="badge-role" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                📖 ගුරුභවතා (Class Teacher)
+            </span>
+            <a href="{% url 'change_password' %}" class="btn btn-outline btn-sm" style="font-size: 0.85rem;">
+                🔑 මුරපදය වෙනස් කරන්න
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Applications for this Teacher's Grades -->
+{% if pending_count > 0 %}
+<div class="alert-box alert-warning" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <div>
+        <strong>🔔 ඔබේ පන්තිය සඳහා නව අයදුම්පත්:</strong> ඔබගේ ශ්‍රේණියට ඇතුළත් වීමට දෙමාපියන් විසින් යොමු කළ නව අයදුම්පත් <strong>{{ pending_count }}</strong>ක් තහවුරු කිරීමට ඇත.
+    </div>
+    <a href="{% url 'pending_verifications' %}" class="btn btn-sm btn-primary">
+        අයදුම්පත් පරීක්ෂා කර අනුමත කරන්න &rarr;
+    </a>
+</div>
+{% endif %}
+
+<!-- Assigned Classes -->
+<div class="card-header-temple" style="border-bottom: none; margin-top: 1rem;">
+    <h3>ඔබ වෙත අනුයුක්ත පන්ති ({% if class_details %}{{ class_details|length }}{% else %}0{% endif %})</h3>
+</div>
+
+{% for item in class_details %}
+<div class="card-box" style="border-top: 3px solid var(--primary-color);">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 1.25rem;">
+        <div>
+            <h3 style="font-size: 1.35rem; margin-bottom: 0.2rem;">
+                🌸 {{ item.class_section.grade_level.name }}
+            </h3>
+            <div style="font-size: 0.9rem; color: var(--text-muted);">
+                කාමරය: <strong>{{ item.class_section.classroom.name|default:"වෙන් කර නැත" }}</strong> | 
+                විෂය: <strong>{{ item.allocation.subject }}</strong>
+                {% if item.allocation.is_class_teacher %}
+                    <span class="status-pill status-approved" style="margin-left: 6px;">ප්‍රධාන පන්තිභාර</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Big Mobile Touch Buttons for Teachers -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="{% url 'mark_attendance' item.class_section.id %}" class="btn btn-primary" style="font-size: 0.95rem; padding: 0.6rem 1.1rem;">
+                📋 ඉරිදා පැමිණීම සටහන් කරන්න
+            </a>
+            <a href="{% url 'export_excel' item.class_section.id %}" class="btn btn-outline" style="font-size: 0.95rem;">
+                📥 Excel නාම ලේඛනය
+            </a>
+            <a href="{% url 'print_roster' item.class_section.id %}" target="_blank" class="btn btn-outline" style="font-size: 0.95rem;">
+                🖨️ මුද්‍රණය
+            </a>
+        </div>
+    </div>
+
+    <!-- Student Roster for this Class -->
+    <h4 style="font-size: 1rem; color: #2c3e50; margin-bottom: 0.75rem;">
+        පන්තියේ ලියාපදිංචි සිසුන් ({{ item.student_count }} දෙනෙක්)
+    </h4>
+
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th>ඇතුළත් වීමේ අංකය</th>
+                    <th>ශිෂ්‍යයාගේ නම</th>
+                    <th>ස්ත්‍රී / පුරුෂ</th>
+                    <th>භාරකරුගේ නම</th>
+                    <th>දුරකථන අංකය</th>
+                    <th>විස්තර</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in item.students %}
+                <tr>
+                    <td><strong>{{ student.admission_number|default:"-" }}</strong></td>
+                    <td>{{ student.name_with_initials_sinhala }}</td>
+                    <td>{{ student.get_gender_display }}</td>
+                    <td>{{ student.guardian.full_name_sinhala }}</td>
+                    <td>
+                        <a href="tel:{{ student.guardian.primary_phone }}" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                            📞 {{ student.guardian.primary_phone }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{% url 'student_detail' student.id %}" class="btn btn-sm btn-outline">බලන්න</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 1.5rem;">
+                        මෙම පන්තියේ තවම සිසුන් ලියාපදිංචි කර නැත.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% empty %}
+<div class="card-box" style="text-align: center; padding: 3rem 1.5rem;">
+    <div style="font-size: 2.5rem; color: var(--text-muted); margin-bottom: 0.5rem;">📚</div>
+    <h3>ඔබ වෙත තවම පන්තියක් අනුයුක්ත කර නොමැත.</h3>
+    <p style="color: var(--text-muted);">කරුණාකර පන්ති අනුයුක්ත කිරීම සඳහා ප්‍රධානාචාර්යතුමන් අමතන්න.</p>
+</div>
+{% endfor %}
+{% endblock %}

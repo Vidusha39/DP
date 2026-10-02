@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.name_with_initials_sinhala }} - ශිෂ්‍ය විස්තර{% endblock %}
+
+{% block content %}
+<div class="card-header-temple">
+    <div>
+        <h2>{{ student.name_with_initials_sinhala }}</h2>
+        <p style="color: var(--text-muted);">
+            ඇතුළත් වීමේ අංකය: <strong>{{ student.admission_number|default:"[තවම ලබා දී නැත]" }}</strong> | 
+            ශ්‍රේණිය: <strong>{{ student.applied_grade.name }}</strong>
+        </p>
+    </div>
+    <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline">&larr; සිසු නාමාවලියට</a>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; flex-wrap: wrap;">
+    <!-- Left Column: Student & Guardian Info -->
+    <div>
+        <div class="card-box" style="border-top: 4px solid var(--primary-color);">
+            <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">ශිෂ්‍ය තොරතුරු</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">සම්පූර්ණ නම:</span>
+                    <div><strong>{{ student.full_name_sinhala }}</strong></div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">මුලකුරු සමඟ නම:</span>
+                    <div><strong>{{ student.name_with_initials_sinhala }}</strong></div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">උපන් දිනය / වයස:</span>
+                    <div>{{ student.dob|date:"Y-m-d" }} (වයස {{ student.age }} යි)</div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">ස්ත්‍රී / පුරුෂ භාවය:</span>
+                    <div>{{ student.get_gender_display }}</div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">අනුයුක්ත පන්තිය:</span>
+                    <div>{{ student.assigned_class|default:"තවම අනුයුක්ත කර නැත" }}</div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">තත්ත්වය:</span>
+                    <div>
+                        {% if student.status == 'APPROVED' %}
+                            <span class="status-pill status-approved">ක්‍රියාකාරී</span>
+                        {% elif student.status == 'PENDING' %}
+                            <span class="status-pill status-pending">අනුමැතිය අපේක්ෂිත</span>
+                        {% else %}
+                            <span class="status-pill status-rejected">{{ student.get_status_display }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if student.medical_notes %}
+            <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color);">
+                <span style="color: #c0392b; font-weight: 600;">⚠️ සෞඛ්‍ය / ආසාත්මිකතා සටහන්:</span>
+                <p>{{ student.medical_notes }}</p>
+            </div>
+            {% endif %}
+
+            {% if student.special_notes %}
+            <div style="margin-top: 0.5rem;">
+                <span style="color: var(--text-muted); font-weight: 600;">වෙනත් සටහන්:</span>
+                <p>{{ student.special_notes }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Guardian Info Card (Normalized 1:N) -->
+        <div class="card-box">
+            <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">දෙමාපිය / භාරකරුගේ තොරතුරු</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">නම:</span>
+                    <div>
+                        <strong>{{ student.guardian.full_name_sinhala }}</strong>
+                        {% if student.guardian.linked_teacher %}
+                            <span class="badge-role" style="font-size: 0.75rem; margin-left: 4px;">ආචාර්ය දරුවෙකි</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">ඥාතිත්වය:</span>
+                    <div>{{ student.get_relationship_to_guardian_display }}</div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">ප්‍රධාන දුරකථනය:</span>
+                    <div>
+                        <a href="tel:{{ student.guardian.primary_phone }}" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">
+                            📞 {{ student.guardian.primary_phone }}
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">වට්ස්ඇප් (WhatsApp):</span>
+                    <div>
+                        {% if student.guardian.whatsapp_phone %}
+                            <a href="https://wa.me/{{ student.guardian.whatsapp_phone }}" target="_blank" style="color: #27ae60; text-decoration: none; font-weight: 600;">
+                                💬 {{ student.guardian.whatsapp_phone }}
+                            </a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="grid-column: span 2;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">ස්ථිර ලිපිනය:</span>
+                    <div>{{ student.guardian.address }}</div>
+                </div>
+            </div>
+
+            <!-- Siblings Registered (1:N relationship proof) -->
+            {% if siblings %}
+            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                <span style="font-weight: 600; color: #2c3e50; font-size: 0.95rem;">
+                    👨‍👩‍👧‍👦 මෙම පවුලේ දහම් පාසලේ ඉගෙනුම ලබන අනෙකුත් දරුවන් (Siblings):
+                </span>
+                <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 6px;">
+                    {% for sib in siblings %}
+                    <div style="background: #f8f9fa; padding: 0.4rem 0.8rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>{{ sib.name_with_initials_sinhala }}</strong> - 🌸 {{ sib.applied_grade.name }}
+                            <small style="color: var(--text-muted);">({{ sib.admission_number|default:"අංකයක් නැත" }})</small>
+                        </div>
+                        <a href="{% url 'student_detail' sib.id %}" class="btn btn-sm btn-outline">බලන්න</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Column: Attendance Overview -->
+    <div>
+        <div class="card-box" style="border-top: 4px solid var(--accent-gold);">
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem;">පැමිණීමේ ප්‍රතිශතය</h3>
+            <div style="text-align: center; padding: 1rem 0;">
+                <div style="font-size: 2.8rem; font-weight: bold; color: var(--primary-color);">
+                    {{ attendance_rate }}%
+                </div>
+                <div style="color: var(--text-muted); font-size: 0.9rem;">
+                    මුළු දින {{ total_sessions }} කින් දින {{ total_attended }} ක් පැමිණ ඇත
+                </div>
+            </div>
+
+            <h4 style="font-size: 0.95rem; margin-top: 1rem; margin-bottom: 0.5rem;">මෑතකාලීන පැමිණීම</h4>
+            <div style="max-height: 250px; overflow-y: auto;">
+                {% for att in attendance_records %}
+                <div style="display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid #f1f2f6; font-size: 0.9rem;">
+                    <span>{{ att.session.date|date:"Y-m-d" }}</span>
+                    {% if att.status == 'PRESENT' %}
+                        <span style="color: #27ae60; font-weight: bold;">✓ පැමිණි</span>
+                    {% elif att.status == 'ABSENT' %}
+                        <span style="color: #e74c3c; font-weight: bold;">✕ නොපැමිණි</span>
+                    {% else %}
+                        <span style="color: #f39c12; font-weight: bold;">{{ att.get_status_display }}</span>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p style="color: var(--text-muted); font-size: 0.85rem;">තවම පැමිණීමේ සටහන් නොමැත.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

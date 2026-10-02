@@ -1,0 +1,474 @@
+/* Google Font: Noto Sans Sinhala as fallback for Iskoola Pota */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #8a1414;      /* Noble Buddhist Maroon / රතු පැහැය */
+    --primary-dark: #630c0c;
+    --accent-gold: #e59819;        /* Golden Saffron / ස්වර්ණමය පැහැය */
+    --accent-gold-light: #fef5e7;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --bg-body: #f8f9fa;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --success-green: #2ecc71;
+    --danger-red: #e74c3c;
+    --warning-yellow: #f1c40f;
+    --font-stack: "Iskoola Pota", "IskoolaPota", "Noto Sans Sinhala", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-stack);
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    line-height: 1.6;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-stack);
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+/* Navbar */
+.navbar-temple {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    border-bottom: 3px solid var(--accent-gold);
+    color: #ffffff;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.brand-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.brand-emblem {
+    font-size: 1.8rem;
+    background: var(--accent-gold);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.brand-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.brand-subtitle {
+    font-size: 0.8rem;
+    color: var(--accent-gold-light);
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: background 0.2s ease;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.badge-role {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 20px;
+    background-color: var(--accent-gold);
+    color: #000;
+}
+
+/* Main Content Container */
+.main-content {
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    padding: 0 1rem 3rem 1rem;
+}
+
+/* Cards */
+.card-box {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-header-temple {
+    border-bottom: 2px solid var(--accent-gold-light);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.35rem;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.form-control, .form-select {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    font-family: var(--font-stack);
+    font-size: 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #fff;
+    color: #2d3436;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(138, 20, 20, 0.15);
+}
+
+.form-help {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-stack);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    gap: 6px;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-gold {
+    background-color: var(--accent-gold);
+    color: #000;
+}
+
+.btn-gold:hover {
+    background-color: #d18512;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border-color);
+    color: var(--text-main);
+}
+
+.btn-outline:hover {
+    background: #edf2f7;
+}
+
+.btn-success {
+    background-color: var(--success-green);
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: var(--danger-red);
+    color: #fff;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+.btn-sm {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+/* Touch-friendly Attendance Marking (Mobile First) */
+.student-attendance-card {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.student-info-meta {
+    flex: 1;
+    min-width: 200px;
+}
+
+.student-name-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.student-adm-badge {
+    display: inline-block;
+    font-size: 0.8rem;
+    background: #e2e8f0;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    color: #4a5568;
+    margin-right: 6px;
+}
+
+/* Touch Toggle Buttons for Attendance */
+.attendance-toggle-group {
+    display: flex;
+    gap: 6px;
+}
+
+.toggle-btn {
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    user-select: none;
+    transition: all 0.15s ease;
+    text-align: center;
+    min-width: 65px;
+}
+
+.toggle-present {
+    background-color: #e8f8f5;
+    color: #16a085;
+    border-color: #a3e4d7;
+}
+
+.toggle-present.active, input[type="radio"]:checked + .toggle-present {
+    background-color: #27ae60;
+    color: #ffffff;
+    border-color: #229954;
+    box-shadow: 0 2px 6px rgba(39, 174, 96, 0.3);
+}
+
+.toggle-absent {
+    background-color: #fdedec;
+    color: #c0392b;
+    border-color: #f5b7b1;
+}
+
+.toggle-absent.active, input[type="radio"]:checked + .toggle-absent {
+    background-color: #e74c3c;
+    color: #ffffff;
+    border-color: #c0392b;
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+.toggle-excused {
+    background-color: #fef9e7;
+    color: #d4ac0d;
+    border-color: #f9e79f;
+}
+
+.toggle-excused.active, input[type="radio"]:checked + .toggle-excused {
+    background-color: #f39c12;
+    color: #ffffff;
+    border-color: #d68910;
+}
+
+/* Sticky Bottom Action Bar for Mobile Attendance */
+.sticky-bottom-bar {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    border-top: 2px solid var(--border-color);
+    padding: 1rem;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Alert Messages */
+.alert-box {
+    padding: 0.9rem 1.2rem;
+    border-radius: 8px;
+    margin-bottom: 1.2rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.alert-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+/* Tables */
+.responsive-table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.temple-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+    background: #fff;
+}
+
+.temple-table th {
+    background-color: #f7fafc;
+    color: #4a5568;
+    padding: 0.85rem 1rem;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.temple-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.temple-table tr:hover {
+    background-color: #fcfdfd;
+}
+
+/* Badge Statuses */
+.status-pill {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+.status-pending { background-color: #fff3cd; color: #856404; }
+.status-approved { background-color: #d4edda; color: #155724; }
+.status-rejected { background-color: #f8d7da; color: #721c24; }
+
+/* Grid Layouts */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 1.25rem;
+    border-radius: 10px;
+    border-left: 5px solid var(--primary-color);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.stat-val {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav-actions {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+    }
+    .student-attendance-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .attendance-toggle-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .toggle-btn {
+        flex: 1;
+        padding: 0.65rem 0.5rem;
+    }
+}

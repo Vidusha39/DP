@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}අයදුම්පත තහවුරු කිරීම - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 650px; margin: 1.5rem auto;">
+    <div class="card-box" style="border-top: 4px solid var(--accent-gold);">
+        <div class="card-header-temple">
+            <div>
+                <h2>ශිෂ්‍ය අයදුම්පත තහවුරු කිරීම</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">
+                    තොරතුරු පරීක්ෂා කර පාසල් ඇතුළත් වීමේ අංකය ලබා දී පන්තියට ඇතුළත් කරන්න.
+                </p>
+            </div>
+            <a href="{% url 'pending_verifications' %}" class="btn btn-sm btn-outline">&larr; ආපසු</a>
+        </div>
+
+        <!-- Student Summary Details -->
+        <div style="background: #fdfaf3; border: 1px solid #fae5b9; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.95rem;">
+                <div>
+                    <span style="color: var(--text-muted);">සම්පූර්ණ නම:</span><br>
+                    <strong>{{ student.full_name_sinhala }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted);">මුලකුරු සමඟ නම:</span><br>
+                    <strong>{{ student.name_with_initials_sinhala }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted);">උපන් දිනය / වයස:</span><br>
+                    <strong>{{ student.dob|date:"Y-m-d" }} (වයස {{ student.age }} යි)</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted);">ස්ත්‍රී / පුරුෂ භාවය:</span><br>
+                    <strong>{{ student.get_gender_display }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted);">ඉල්ලුම් කළ ශ්‍රේණිය:</span><br>
+                    <strong style="color: var(--primary-color);">🌸 {{ student.applied_grade.name }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted);">භාරකරුගේ නම:</span><br>
+                    <strong>{{ student.guardian.full_name_sinhala }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted);">දුරකථන අංකය:</span><br>
+                    <strong>{{ student.guardian.primary_phone }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted);">ලිපිනය:</span><br>
+                    <span>{{ student.guardian.address }}</span>
+                </div>
+            </div>
+
+            {% if student.medical_notes %}
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #e2e8f0;">
+                <span style="color: #c0392b; font-weight: 600;">⚠️ සෞඛ්‍ය සටහන්:</span> {{ student.medical_notes }}
+            </div>
+            {% endif %}
+
+            {% if student.special_notes %}
+            <div style="margin-top: 0.5rem;">
+                <span style="color: var(--text-muted); font-weight: 600;">විශේෂ සටහන්:</span> {{ student.special_notes }}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Approval Form -->
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group" style="background: #fff8eb; border: 1.5px solid var(--accent-gold); padding: 1.25rem; border-radius: 8px;">
+                <label class="form-label" for="admission_number" style="font-size: 1.1rem; color: #8a1414;">
+                    ඇතුළත් වීමේ අංකය (Admission Number) <span style="color: red;">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    name="admission_number" 
+                    id="admission_number" 
+                    class="form-control" 
+                    required 
+                    placeholder="උදා: 2026/003 හෝ 1005"
+                    style="font-size: 1.15rem; font-weight: bold; color: var(--primary-color);"
+                >
+                <div class="form-help">
+                    * ගුරුභවතා හෝ ප්‍රධානාචාර්යතුමන් විසින් පාසලේ ප්‍රධාන ලේඛනයට අනුව ඇතුළත් වීමේ අංකය මෙහි සටහන් කළ යුතුය.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="assigned_class">අනුයුක්ත කරන පන්තිය / කාණ්ඩය (Class Section)</label>
+                <select name="assigned_class" id="assigned_class" class="form-select" required>
+                    {% for sec in available_sections %}
+                        <option value="{{ sec.id }}">
+                            {{ sec.grade_level.name }} - {{ sec.section_name }} (කාමරය: {{ sec.classroom.name|default:"වෙන් කර නැත" }})
+                        </option>
+                    {% empty %}
+                        <option value="">මෙම ශ්‍රේණිය සඳහා පන්ති කාණ්ඩයක් සකසා නැත</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                <button type="submit" name="action" value="APPROVE" class="btn btn-success" style="flex: 2; padding: 0.8rem; font-size: 1.05rem;">
+                    ✓ අනුමත කර පන්තියට ඇතුළත් කරන්න
+                </button>
+                <button type="submit" name="action" value="REJECT" class="btn btn-danger" style="flex: 1; padding: 0.8rem;" onclick="return confirm('මෙම අයදුම්පත ප්‍රතික්ෂේප කිරීමට ඔබට විශ්වාසද?');">
+                    ✕ ප්‍රතික්ෂේප කරන්න
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

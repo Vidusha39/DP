@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}ශ්‍රේණි සඳහා ස්ථාන අනුයුක්ත කිරීම - සාම දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple" style="border-bottom: none; margin-bottom: 0.5rem;">
+    <div>
+        <h2>🏛️ ශ්‍රේණි සඳහා ස්ථාන අනුයුක්ත කිරීම</h2>
+        <p style="color: var(--text-muted);">
+            {{ current_year.year }} අධ්‍යයන වර්ෂය සඳහා එක් එක් ශ්‍රේණියේ පන්ති පැවැත්වෙන ධර්ම ශාලා සහ කාමර වෙන් කිරීම.
+        </p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="{% url 'grade_list' %}" class="btn btn-primary btn-sm">
+            📚 ශ්‍රේණි කළමනාකරණය
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline btn-sm">
+            ⬅️ පාලක පුවරුව
+        </a>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 1.5rem;">
+    <!-- Card 1: Fast Single Grade Location Allocation -->
+    <div class="card-box" style="margin-bottom: 0;">
+        <div class="card-header-temple">
+            <h3 style="font-size: 1.15rem;">🎯 ක්ෂණික ස්ථාන අනුයුක්තය</h3>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="single_allocation">
+
+            <div class="form-group">
+                <label class="form-label" for="id_grade_id">ශ්‍රේණිය තෝරන්න <span style="color: var(--danger-red);">*</span></label>
+                <select name="grade_id" id="id_grade_id" class="form-select" required>
+                    <option value="">-- ශ්‍රේණියක් තෝරන්න --</option>
+                    {% for item in allocation_list %}
+                        <option value="{{ item.grade.id }}">
+                            {{ item.grade.name }} {% if item.classroom %}(දැනට: {{ item.classroom.name }}){% else %}(ස්ථානයක් නැත){% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_classroom_id">අනුයුක්ත කරන ස්ථානය / ශාලාව</label>
+                <select name="classroom_id" id="id_classroom_id" class="form-select">
+                    <option value="">-- ස්ථානයක් වෙන් කර නැත (Unassigned) --</option>
+                    {% for room in classrooms %}
+                        <option value="{{ room.id }}">{{ room.name }} (ධාරිතාව: {{ room.capacity }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                💾 ස්ථානය අනුයුක්ත කරන්න
+            </button>
+        </form>
+    </div>
+
+    <!-- Card 2: Quick Add New Location/Hall -->
+    <div class="card-box" style="margin-bottom: 0;">
+        <div class="card-header-temple">
+            <h3 style="font-size: 1.15rem;">➕ නව ශාලාවක් / ස්ථානයක් එක් කිරීම</h3>
+        </div>
+        <form method="post" action="{% url 'create_classroom' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="id_new_room_name">
+                    ස්ථානයේ / ශාලාවේ නම <span style="color: var(--danger-red);">*</span>
+                </label>
+                <input type="text" name="name" id="id_new_room_name" class="form-control" 
+                       placeholder="උදා: 2 වන ගොඩනැගිල්ල - කාමර අංක 03" required>
+                <div class="form-help">දහම් පාසලේ ගොඩනැගිල්ල හෝ ශාලාවේ නම</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_new_room_capacity">
+                    ශිෂ්‍ය ධාරිතාව (Capacity) <span style="color: var(--danger-red);">*</span>
+                </label>
+                <input type="number" name="capacity" id="id_new_room_capacity" class="form-control" 
+                       value="40" min="1" required>
+                <div class="form-help">එක්වර රඳවාගත හැකි උපරිම ශිෂ්‍ය සංඛ්‍යාව</div>
+            </div>
+
+            <button type="submit" class="btn btn-gold btn-block">
+                🏛️ නව ස්ථානය පද්ධතියට එක් කරන්න
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Card 3: Batch Location Allocation Table -->
+<div class="card-box">
+    <div class="card-header-temple">
+        <div>
+            <h3>සියලු ශ්‍රේණි සඳහා ස්ථාන වෙන් කිරීම් ({{ current_year.year }})</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
+                එක් එක් ශ්‍රේණිය ඉදිරියෙන් ඇති පතනයෙන් (dropdown) ශාලාව තෝරා පහළ ඇති "සියල්ල සුරකින්න" බොත්තම ඔබන්න.
+            </p>
+        </div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="batch_allocation">
+
+        <div class="responsive-table-wrapper">
+            <table class="temple-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60px; text-align: center;">අංකය</th>
+                        <th>ශ්‍රේණිය</th>
+                        <th style="text-align: center;">සක්‍රීය සිසුන්</th>
+                        <th style="min-width: 250px;">අනුයුක්ත ස්ථානය / ශාලාව</th>
+                        <th style="text-align: center;">ධාරිතාව</th>
+                        <th style="text-align: center;">තත්ත්වය</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in allocation_list %}
+                    <tr>
+                        <td style="text-align: center; font-weight: 700; color: var(--primary-color);">
+                            #{{ item.grade.order_index }}
+                        </td>
+                        <td>
+                            <strong>{{ item.grade.name }}</strong>
+                            {% if item.grade.english_name %}
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.grade.english_name }}</div>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            <span class="status-pill status-approved" style="font-size: 0.85rem;">
+                                {{ item.student_count }} දෙනෙක්
+                            </span>
+                        </td>
+                        <td>
+                            <select name="classroom_for_grade_{{ item.grade.id }}" class="form-select" style="font-size: 0.9rem; padding: 0.4rem 0.6rem;">
+                                <option value="">-- ස්ථානයක් වෙන් කර නැත --</option>
+                                {% for room in classrooms %}
+                                    <option value="{{ room.id }}" {% if item.classroom and item.classroom.id == room.id %}selected{% endif %}>
+                                        🏛️ {{ room.name }} (ධාරිතාව: {{ room.capacity }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td style="text-align: center;">
+                            {% if item.classroom %}
+                                <strong>{{ item.classroom.capacity }}</strong>
+                            {% else %}
+                                <span style="color: var(--text-muted);">-</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            {% if not item.classroom %}
+                                <span style="background: #fff3cd; color: #856404; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+                                    ස්ථානයක් නැත
+                                </span>
+                            {% elif item.is_over_capacity %}
+                                <span style="background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;" title="සිසුන් ගණන ශාලාවේ ධාරිතාවට වඩා වැඩිය">
+                                    ⚠️ ධාරිතාව ඉක්මවා ඇත
+                                </span>
+                            {% else %}
+                                <span style="background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+                                    ✓ ප්‍රමාණවත්
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            තවම ශ්‍රේණි ඇතුළත් කර නොමැත.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem; font-size: 1.05rem;">
+                💾 සියලු ස්ථාන අනුයුක්ත කිරීම් එකවර සුරකින්න
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Card 4: Existing Locations / Halls Directory -->
+<div class="card-box">
+    <div class="card-header-temple">
+        <h3>පවතින ස්ථාන සහ ශාලා නාමාවලිය</h3>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">මුළු ශාලා ගණන: {{ classrooms.count }}</span>
+    </div>
+
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th>ස්ථානය / ශාලාවේ නම</th>
+                    <th style="text-align: center;">ශිෂ්‍ය ධාරිතාව</th>
+                    <th>දැනට පවත්වන ශ්‍රේණි</th>
+                    <th style="text-align: right;">ක්‍රියාකාරකම්</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for room in classrooms %}
+                <tr>
+                    <td><strong>🏛️ {{ room.name }}</strong></td>
+                    <td style="text-align: center;">{{ room.capacity }} දෙනෙක්</td>
+                    <td>
+                        {% with sections=room.classsection_set.all %}
+                            {% if sections %}
+                                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                                    {% for s in sections %}
+                                        <span style="background: #eef2f7; color: var(--primary-color); padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">
+                                            {{ s.grade_level.name }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <span style="color: var(--text-muted); font-size: 0.85rem;">[දැනට කිසිදු ශ්‍රේණියකට වෙන් කර නැත]</span>
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                    <td style="text-align: right;">
+                        <form method="post" action="{% url 'delete_classroom' room.id %}" style="display: inline;" 
+                              onsubmit="return confirm('ඔබට \'{{ room.name }}\' ස්ථානය මකා දැමීමට අවශ්‍ය බව සහතිකද?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline" style="color: var(--danger-red); border-color: #fed7d7;" title="ස්ථානය මකා දමන්න">
+                                🗑️ මකන්න
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">
+                        තවමත් කිසිදු ශාලාවක් හෝ ස්ථානයක් ඇතුළත් කර නොමැත.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

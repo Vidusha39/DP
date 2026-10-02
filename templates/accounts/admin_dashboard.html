@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}පාලක පුවරුව - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple" style="border-bottom: none; margin-bottom: 0.5rem;">
+    <div>
+        <h2>ප්‍රධාන පාලක පුවරුව</h2>
+        <p style="color: var(--text-muted);">
+            {% if is_admin %}පද්ධති පරිපාලක (Administrator){% else %}ප්‍රධානාචාර්යතුමන් (Principal){% endif %} - 
+            අධ්‍යයන වර්ෂය: {% if current_year %}{{ current_year.year }}{% else %}2026{% endif %}
+        </p>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <a href="{% url 'pending_verifications' %}" class="btn btn-gold btn-sm">
+            🔔 අනුමැතිය අපේක්ෂිත අයදුම්පත් ({{ pending_count }})
+        </a>
+        <a href="{% url 'grade_create' %}" class="btn btn-primary btn-sm">
+            ➕ නව ශ්‍රේණියක්
+        </a>
+        <a href="{% url 'create_teacher' %}" class="btn btn-primary btn-sm">
+            ➕ නව ගුරුභවතෙක් ලියාපදිංචිය
+        </a>
+        <a href="{% url 'change_password' %}" class="btn btn-outline btn-sm">
+            🔑 මුරපදය වෙනස් කරන්න
+        </a>
+    </div>
+</div>
+
+<!-- Metrics Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-val">{{ total_students }}</div>
+        <div class="stat-label">සක්‍රීය ශිෂ්‍ය සංඛ්‍යාව (Active Students)</div>
+    </div>
+    <div class="stat-card" style="border-left-color: {% if pending_count > 0 %}#e67e22{% else %}var(--primary-color){% endif %};">
+        <div class="stat-val" style="color: {% if pending_count > 0 %}#d35400{% else %}var(--primary-color){% endif %};">{{ pending_count }}</div>
+        <div class="stat-label">තහවුරු කිරීම බලාපොරොත්තු වන අයදුම්පත්</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-val">{{ total_teachers }}</div>
+        <div class="stat-label">ආචාර්ය මණ්ඩලය (Teachers)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-val">{{ current_year.year|default:"2026" }}</div>
+        <div class="stat-label">වත්මන් අධ්‍යයන වර්ෂය</div>
+    </div>
+</div>
+
+<!-- Pending Approvals Alert Banner (if any) -->
+{% if pending_count > 0 %}
+<div class="alert-box alert-warning" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+    <div>
+        <strong>අවධානයට:</strong> ජංගම දුරකථන මාර්ගයෙන් දෙමාපියන් විසින් ඉදිරිපත් කළ නව ශිෂ්‍ය අයදුම්පත් <strong>{{ pending_count }}</strong>ක් තහවුරු කිරීමට බලාපොරොත්තුවෙන් පවතී.
+    </div>
+    <a href="{% url 'pending_verifications' %}" class="btn btn-sm btn-primary" style="margin-top: 4px;">දැන්ම පරීක්ෂා කර අනුමත කරන්න &rarr;</a>
+</div>
+{% endif %}
+
+<!-- Class Sections & Teacher Allocations Table -->
+<div class="card-box">
+    <div class="card-header-temple">
+        <h3>පන්ති සහ ගුරු අනුයුක්ත සාරාංශය</h3>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <a href="{% url 'allocate_grade_location' %}" class="btn btn-sm btn-outline">🏛️ ස්ථාන අනුයුක්ත කිරීම</a>
+            <a href="{% url 'allocate_teacher' %}" class="btn btn-sm btn-outline">✏️ ගුරු අනුයුක්ත කිරීම්</a>
+            <a href="{% url 'grade_list' %}" class="btn btn-sm btn-primary">📚 ශ්‍රේණි කළමනාකරණය</a>
+        </div>
+    </div>
+
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th>ශ්‍රේණිය / පන්තිය</th>
+                    <th>ශාලාව / කාමරය</th>
+                    <th>සිසුන් ගණන</th>
+                    <th>ප්‍රධාන පන්තිභාර ගුරුභවතා</th>
+                    <th>ක්‍රියාකාරකම්</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in class_summaries %}
+                <tr>
+                    <td><strong>{{ item.section.grade_level.name }}</strong></td>
+                    <td>{{ item.section.classroom.name|default:"තවම වෙන් කර නැත" }}</td>
+                    <td>
+                        <span class="status-pill status-approved" style="font-size: 0.9rem;">
+                            {{ item.student_count }} දෙනෙක්
+                        </span>
+                    </td>
+                    <td>
+                        {% if item.class_teacher %}
+                            <span style="font-weight: 600; color: var(--primary-color);">
+                                👤 {{ item.class_teacher.display_name }}
+                            </span>
+                        {% else %}
+                            <span style="color: #e74c3c; font-size: 0.85rem;">[පන්තිභාර ගුරුභවතෙක් පත් කර නැත]</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 6px;">
+                            <a href="{% url 'mark_attendance' item.section.id %}" class="btn btn-sm btn-outline" title="පැමිණීම සටහන් කරන්න">
+                                📋 පැමිණීම
+                            </a>
+                            <a href="{% url 'export_excel' item.section.id %}" class="btn btn-sm btn-outline" title="Excel බාගත කරන්න">
+                                📥 Excel
+                            </a>
+                            <a href="{% url 'print_roster' item.section.id %}" target="_blank" class="btn btn-sm btn-outline" title="මුද්‍රණය කරන්න">
+                                🖨️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                        පන්ති තොරතුරු සොයාගත නොහැකි විය.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

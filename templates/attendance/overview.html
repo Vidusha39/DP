@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}පැමිණීම සහ වාර්තා - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div class="card-header-temple">
+    <div>
+        <h2>පැමිණීම සහ පන්ති වාර්තා</h2>
+        <p style="color: var(--text-muted);">
+            අධ්‍යයන වර්ෂය: {% if current_year %}{{ current_year.year }}{% else %}2026{% endif %} | 
+            පන්ති පැමිණීම සටහන් කිරීම හා Excel වාර්තා බාගත කිරීම
+        </p>
+    </div>
+</div>
+
+<div class="card-box">
+    <div class="responsive-table-wrapper">
+        <table class="temple-table">
+            <thead>
+                <tr>
+                    <th>ශ්‍රේණිය</th>
+                    <th>ශාලාව</th>
+                    <th>සිසුන් ගණන</th>
+                    <th>ක්‍රියාමාර්ග</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cs in classes %}
+                <tr>
+                    <td><strong>🌸 {{ cs.grade_level.name }}</strong></td>
+                    <td>{{ cs.classroom.name|default:"වෙන් කර නැත" }}</td>
+                    <td>
+                        <span class="status-pill status-approved">
+                            {{ cs.students.count }} දෙනෙක්
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a href="{% url 'mark_attendance' cs.id %}" class="btn btn-sm btn-primary">
+                                📋 පැමිණීම ලකුණු කරන්න
+                            </a>
+                            <a href="{% url 'export_excel' cs.id %}" class="btn btn-sm btn-outline">
+                                📥 Excel බාගත කරන්න
+                            </a>
+                            <a href="{% url 'print_roster' cs.id %}" target="_blank" class="btn btn-sm btn-outline">
+                                🖨️ මුද්‍රණය
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                        පන්ති තොරතුරු සොයාගත නොහැකි විය.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if recent_sessions %}
+<div class="card-box" style="margin-top: 1.5rem;">
+    <h3 style="font-size: 1.15rem; margin-bottom: 0.75rem;">මෑතකාලීන දහම් පාසල් ඉරිදා දින (Recent Sunday Sessions)</h3>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        {% for sess in recent_sessions %}
+            <span style="background: #edf2f7; padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.9rem;">
+                📅 <strong>{{ sess.date|date:"Y-m-d" }}</strong> ({{ sess.get_term_display }})
+            </span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

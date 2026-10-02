@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}ශ්‍රේණිය මකා දැමීම - {{ grade.name }} - සාම දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 2rem auto;">
+    <div class="card-box" style="border-top: 4px solid var(--danger-red);">
+        <div class="card-header-temple">
+            <h2 style="color: var(--danger-red);">🗑️ ශ්‍රේණිය මකා දැමීම</h2>
+            <a href="{% url 'grade_list' %}" class="btn btn-outline btn-sm">⬅️ ආපසු</a>
+        </div>
+
+        {% if cannot_delete %}
+            <!-- Warning: cannot delete because students are enrolled -->
+            <div class="alert-box alert-warning" style="margin-bottom: 1.5rem;">
+                <h4 style="color: #c0392b; margin-bottom: 0.5rem;">⚠️ මෙම ශ්‍රේණිය මකා දැමිය නොහැක!</h4>
+                <p>
+                    <strong>"{{ grade.name }}"</strong> ශ්‍රේණියට අදාළව පද්ධතිය තුළ ලියාපදිංචි වී ඇති හෝ අයදුම් කර ඇති සිසුන් <strong>{{ total_students }}</strong> දෙනෙකු සිටී.
+                </p>
+                <ul style="margin: 0.75rem 0 0.75rem 1.5rem; font-size: 0.95rem;">
+                    {% if assigned_count %}
+                        <li>පන්තිවලට අනුයුක්ත සක්‍රීය සිසුන්: <strong>{{ assigned_count }}</strong></li>
+                    {% endif %}
+                    {% if applied_count %}
+                        <li>අයදුම් කර ඇති/තහවුරු කිරීමේ සිසුන්: <strong>{{ applied_count }}</strong></li>
+                    {% endif %}
+                </ul>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">
+                    දත්ත ආරක්‍ෂාව තහවුරු කිරීම සඳහා, සිසුන් ලියාපදිංචි වී ඇති ශ්‍රේණි මකා දැමීම අවහිර කර ඇත. මෙම ශ්‍රේණිය මකා දැමීමට අවශ්‍ය නම්, කරුණාකර පළමුව අදාළ සිසුන් වෙනත් ශ්‍රේණියකට මාරු කරන්න.
+                </p>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <a href="{% url 'grade_list' %}" class="btn btn-primary">ශ්‍රේණි ලැයිස්තුවට ආපසු</a>
+            </div>
+
+        {% else %}
+            <!-- Safe to delete confirmation -->
+            <div style="margin-bottom: 1.5rem;">
+                <p style="font-size: 1.1rem; margin-bottom: 1rem;">
+                    ඔබට <strong>"{{ grade.name }}"</strong> (අංක #{{ grade.order_index }}) ශ්‍රේණිය පද්ධතියෙන් ස්ථිරවම මකා දැමීමට අවශ්‍ය බව සහතිකද?
+                </p>
+                <div style="background: #fff5f5; border: 1px solid #fed7d7; border-radius: 8px; padding: 1rem; color: #c53030; font-size: 0.9rem;">
+                    ℹ️ මෙම ශ්‍රේණියට දැනට කිසිදු ශිෂ්‍යයෙක් සම්බන්ධ වී නොමැත. මකා දැමීමෙන් පසු මෙය ආපසු හැරවිය නොහැක.
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+                    <a href="{% url 'grade_list' %}" class="btn btn-outline">අවලංගු කරන්න</a>
+                    <button type="submit" class="btn btn-danger">
+                        🗑️ ඔව්, මෙම ශ්‍රේණිය මකා දමන්න
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

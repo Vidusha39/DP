@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}ලියාපදිංචිය සාර්ථකයි - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 580px; margin: 2rem auto; text-align: center;">
+    <div class="card-box" style="border-top: 5px solid var(--success-green); padding: 2.5rem 1.5rem;">
+        <div style="font-size: 4rem; color: var(--success-green); margin-bottom: 1rem;">✓</div>
+        <h2 style="color: #27ae60; margin-bottom: 0.5rem;">අයදුම්පත සාර්ථකව ලැබිණි!</h2>
+        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 1.5rem;">
+            ශිෂ්‍ය <strong>{{ student.full_name_sinhala }}</strong> වෙනුවෙන් ඉදිරිපත් කළ ලියාපදිංචි අයදුම්පත දහම් පාසල් පද්ධතියට සාර්ථකව ඇතුළත් විය.
+        </p>
+
+        <div style="background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 8px; padding: 1.25rem; text-align: left; margin-bottom: 1.75rem;">
+            <div style="margin-bottom: 0.5rem;">
+                <span style="color: var(--text-muted); font-size: 0.9rem;">අයදුම් කළ ශ්‍රේණිය:</span>
+                <strong style="font-size: 1.05rem; color: var(--primary-color); margin-left: 6px;">{{ student.applied_grade.name }}</strong>
+            </div>
+            <div style="margin-bottom: 0.5rem;">
+                <span style="color: var(--text-muted); font-size: 0.9rem;">භාරකරුගේ නම:</span>
+                <strong style="margin-left: 6px;">{{ student.guardian.full_name_sinhala }}</strong>
+            </div>
+            <div style="margin-bottom: 0.5rem;">
+                <span style="color: var(--text-muted); font-size: 0.9rem;">දුරකථන අංකය:</span>
+                <strong style="margin-left: 6px;">{{ student.guardian.primary_phone }}</strong>
+            </div>
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.9rem;">වත්මන් තත්ත්වය:</span>
+                <span class="status-pill status-pending" style="margin-left: 6px;">
+                    අනුමැතිය අපේක්ෂිත (Pending Verification)
+                </span>
+            </div>
+        </div>
+
+        <div class="alert-box alert-info" style="text-align: left; font-size: 0.9rem;">
+            ℹ️ <strong>ඉදිරි පියවර:</strong> ඔබගේ අයදුම්පත පන්තිභාර ආචාර්යතුමන් හෝ ප්‍රධානාචාර්යතුමන් විසින් පරීක්ෂා කර, පාසල් ඇතුළත් වීමේ අංකය ලබා දීමෙන් පසු නිල වශයෙන් පන්තියට අනුයුක්ත කෙරෙනු ඇත.
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+            <a href="{% url 'public_register' %}" class="btn btn-outline">
+                ➕ තවත් දරුවෙකු ලියාපදිංචි කරන්න (Add Sibling)
+            </a>
+            <a href="{% url 'home' %}" class="btn btn-primary">
+                මුල් පිටුවට (Home)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
