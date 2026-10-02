@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ teacher.display_name }} - ගුරු විස්තර - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 1.5rem auto;">
+    <div class="card-header-temple" style="border-bottom: none; margin-bottom: 1rem;">
+        <div>
+            <h2>{{ teacher.display_name }}</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">{{ teacher.full_name_sinhala }}</p>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <a href="{% url 'teacher_list' %}" class="btn btn-outline btn-sm">⬅️ ලැයිස්තුවට</a>
+            {% if is_staff_or_admin %}
+                <a href="{% url 'edit_teacher' teacher.id %}" class="btn btn-primary btn-sm">✏️ සංස්කරණය</a>
+                <a href="{% url 'allocate_teacher' %}" class="btn btn-gold btn-sm">📌 පන්ති අනුයුක්තය</a>
+                <a href="{% url 'delete_teacher' teacher.id %}" class="btn btn-outline btn-sm" style="color: #e74c3c; border-color: #e74c3c;">🗑️ ඉවත් කරන්න</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card-box" style="margin-bottom: 1.5rem;">
+        <h3 style="color: #8a1414; border-bottom: 2px solid var(--accent-gold); padding-bottom: 0.4rem; margin-bottom: 1rem;">
+            👤 පෞද්ගලික සහ සේවා තොරතුරු
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px;">
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">පරිශීලක නාමය (Username):</span>
+                <div style="font-weight: 600; font-family: monospace; font-size: 1.05rem; color: #2980b9;">
+                    🔑 {{ teacher.user.username|default:"ගිණුමක් සකසා නැත" }}
+                </div>
+            </div>
+
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">තත්ත්වය (Status):</span>
+                <div>
+                    {% if teacher.is_active %}
+                        <span class="status-pill status-approved">ක්‍රියාකාරී</span>
+                    {% else %}
+                        <span class="status-pill status-rejected">අක්‍රිය</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">දුරකථන අංකය:</span>
+                <div style="font-weight: 600;">
+                    <a href="tel:{{ teacher.phone }}" style="color: inherit; text-decoration: none;">📞 {{ teacher.phone }}</a>
+                </div>
+            </div>
+
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">වට්ස්ඇප් (WhatsApp):</span>
+                <div style="font-weight: 600;">
+                    {% if teacher.whatsapp_phone %}
+                        <a href="https://wa.me/{{ teacher.whatsapp_phone }}" target="_blank" style="color: #27ae60; text-decoration: none;">
+                            💬 {{ teacher.whatsapp_phone }}
+                        </a>
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <span style="color: var(--text-muted); font-size: 0.85rem;">සේවයට එක්වූ දිනය:</span>
+                <div style="font-weight: 600;">{{ teacher.date_joined|default:"සඳහන් කර නැත" }}</div>
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+                <span style="color: var(--text-muted); font-size: 0.85rem;">ලිපිනය:</span>
+                <div>{{ teacher.address|default:"-" }}</div>
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+                <span style="color: var(--text-muted); font-size: 0.85rem;">සුදුසුකම් (Qualifications):</span>
+                <div style="background: #fdfaf3; padding: 0.6rem 0.8rem; border-radius: 4px; border-left: 3px solid var(--accent-gold);">
+                    {{ teacher.qualifications|default:"සුදුසුකම් ඇතුළත් කර නොමැත" }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Classes & Subjects -->
+    <div class="card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 2px solid var(--accent-gold); padding-bottom: 0.4rem;">
+            <h3 style="color: #8a1414; margin-bottom: 0;">
+                🌸 අනුයුක්ත පන්ති සහ විෂයයන් (Allocations)
+            </h3>
+            {% if is_staff_or_admin %}
+                <a href="{% url 'allocate_teacher' %}" class="btn btn-gold btn-sm">➕ පන්තියක් අනුයුක්ත කරන්න</a>
+            {% endif %}
+        </div>
+
+        {% if allocations %}
+            <div class="responsive-table-wrapper">
+                <table class="temple-table">
+                    <thead>
+                        <tr>
+                            <th>ශ්‍රේණිය</th>
+                            <th>විෂයය</th>
+                            <th>පන්තිභාර භූමිකාව</th>
+                            <th>ස්ථානය (කාමරය)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alloc in allocations %}
+                        <tr>
+                            <td><strong>{{ alloc.class_section.grade_level.name }}</strong></td>
+                            <td>{{ alloc.subject }}</td>
+                            <td>
+                                {% if alloc.is_class_teacher %}
+                                    <span class="status-pill status-approved">⭐ ප්‍රධාන පන්තිභාර</span>
+                                {% else %}
+                                    <span style="color: var(--text-muted);">විෂය භාර</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ alloc.class_section.classroom.name|default:"වෙන් කර නොමැත" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                මෙම ගුරුභවතාට තවමත් පන්තියක් හෝ විෂයයක් අනුයුක්ත කර නොමැත.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

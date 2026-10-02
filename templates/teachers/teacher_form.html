@@ -1,89 +1,176 @@
 {% extends 'base.html' %}
 
-{% block title %}නව ගුරුභවතෙක් ලියාපදිංචිය - දහම් පාසල{% endblock %}
+{% block title %}
+    {% if is_edit %}ගුරු තොරතුරු සංස්කරණය - {{ teacher.display_name }}{% else %}නව ගුරුභවතෙක් ලියාපදිංචිය{% endif %} - දහම් පාසල
+{% endblock %}
 
 {% block content %}
-<div style="max-width: 600px; margin: 1.5rem auto;">
+<div style="max-width: 650px; margin: 1.5rem auto;">
     <div class="card-box" style="border-top: 4px solid var(--primary-color);">
         <div class="card-header-temple">
             <div>
-                <h2>නව ගුරුභවතෙක් ලියාපදිංචි කිරීම</h2>
+                <h2>{% if is_edit %}✏️ ගුරු තොරතුරු සංස්කරණය{% else %}➕ නව ගුරුභවතෙක් ලියාපදිංචිය{% endif %}</h2>
                 <p style="color: var(--text-muted); font-size: 0.9rem;">
-                    ප්‍රධානාචාර්යතුමන් හෝ පරිපාලක විසින් නව ආචාර්ය මණ්ඩල සාමාජිකයෙකු එක් කිරීම
+                    {% if is_edit %}
+                        {{ teacher.display_name }} ගුරුභවතාගේ තොරතුරු හෝ පිවිසුම් මුරපදය වෙනස් කිරීම
+                    {% else %}
+                        ප්‍රධානාචාර්යතුමන් හෝ පරිපාලක විසින් නව ආචාර්ය මණ්ඩල සාමාජිකයෙකු එක් කිරීම
+                    {% endif %}
                 </p>
             </div>
-            <a href="{% url 'teacher_list' %}" class="btn btn-sm btn-outline">&larr; ආපසු</a>
+            <a href="{% url 'teacher_list' %}" class="btn btn-sm btn-outline">&larr; ආචාර්ය මණ්ඩල ලැයිස්තුව</a>
         </div>
 
         <form method="post">
             {% csrf_token %}
 
-            <div style="background: #fdfaf3; padding: 0.8rem 1rem; border-left: 4px solid var(--accent-gold); margin-bottom: 1rem;">
-                <h4 style="margin-bottom: 0; color: #8a1414;">පද්ධති පිවිසුම් තොරතුරු (User Account)</h4>
+            <!-- User Account / Login Credentials Section -->
+            <div style="background: #fdfaf3; padding: 0.8rem 1rem; border-left: 4px solid var(--accent-gold); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="margin-bottom: 0; color: #8a1414;">🔑 පද්ධති පිවිසුම් තොරතුරු (Login Credentials)</h4>
+                {% if is_edit and teacher.user %}
+                    <span style="font-size: 0.8rem; background: #eef2ff; color: #4338ca; padding: 2px 8px; border-radius: 4px; font-family: monospace;">
+                        User ID: #{{ teacher.user.id }}
+                    </span>
+                {% endif %}
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div class="form-group">
                     <label class="form-label" for="username">පරිශීලක නාමය (Username) <span style="color: red;">*</span></label>
-                    <input type="text" name="username" id="username" class="form-control" required value="{{ suggested_username|default:'teacher14' }}" placeholder="උදා: teacher14">
+                    <input type="text" name="username" id="username" class="form-control" required 
+                           value="{% if is_edit %}{{ existing_username }}{% else %}{{ suggested_username|default:'teacher14' }}{% endif %}" 
+                           placeholder="උදා: teacher1">
                 </div>
+
                 <div class="form-group">
-                    <label class="form-label" for="password">ආරම්භක මුරපදය (Initial Password) <span style="color: red;">*</span></label>
-                    <input type="text" name="password" id="password" class="form-control" required value="{{ default_password|default:'teacher123' }}" placeholder="teacher123">
+                    <label class="form-label" for="password">
+                        {% if is_edit %}
+                            නව මුරපදය (New Password)
+                        {% else %}
+                            ආරම්භක මුරපදය (Initial Password) <span style="color: red;">*</span>
+                        {% endif %}
+                    </label>
+                    <input type="text" name="{% if is_edit %}new_password{% else %}password{% endif %}" 
+                           id="password" class="form-control" 
+                           {% if not is_edit %}required value="{{ default_password|default:'teacher123' }}"{% endif %}
+                           placeholder="{% if is_edit %}මුරපදය වෙනස් කිරීමට පමණක් ටයිප් කරන්න{% else %}teacher123{% endif %}">
                 </div>
             </div>
-            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: -0.5rem; margin-bottom: 1rem; line-height: 1.4;">
-                💡 <strong>සටහන:</strong> පහසු භාවිතය සඳහා පෙරනිමි මුරපදය ලෙස <code style="font-weight: bold; color: #2c3e50;">teacher123</code> සකසා ඇත. ගුරුභවතාට තම ගිණුමෙන් (Account) ඕනෑම වේලාවක මෙම මුරපදය වෙනස් කරගත හැක.
+
+            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: -0.5rem; margin-bottom: 1.2rem; line-height: 1.4;">
+                {% if is_edit %}
+                    💡 <strong>සටහන:</strong> මුරපදය වෙනස් කිරීමට අවශ්‍ය නැතිනම් මුරපද කොටුව හිස්ව තබන්න. පෙර මුරපදය නොවෙනස්ව පවතිනු ඇත.
+                {% else %}
+                    💡 <strong>පෙරනිමි මුරපදය:</strong> භාවිතයේ පහසුව සඳහා <code style="font-weight: bold; color: #2c3e50;">teacher123</code> පෙරනිමියෙන් යොදා ඇත.
+                {% endif %}
             </div>
 
-            <div style="background: #fdfaf3; padding: 0.8rem 1rem; border-left: 4px solid var(--accent-gold); margin: 1.5rem 0 1rem 0;">
-                <h4 style="margin-bottom: 0; color: #8a1414;">ගුරුභවතාගේ පෞද්ගලික විස්තර</h4>
+            <!-- Teacher Personal Details -->
+            <div style="background: #fdfaf3; padding: 0.8rem 1rem; border-left: 4px solid var(--accent-gold); margin: 1.2rem 0 1rem 0;">
+                <h4 style="margin-bottom: 0; color: #8a1414;">👤 ගුරුභවතාගේ පෞද්ගලික විස්තර</h4>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="title">ගෞරව නාමය <span style="color: red;">*</span></label>
-                <select name="title" id="title" class="form-select">
-                    <option value="VEN">පූජ්‍ය (Venerable)</option>
-                    <option value="MR" selected>ගුරු මයා (Mr.)</option>
-                    <option value="MRS">ගුරු මිය (Mrs.)</option>
-                    <option value="MISS">මෙනවිය (Miss)</option>
-                </select>
+            <div style="display: grid; grid-template-columns: 140px 1fr; gap: 12px;">
+                <div class="form-group">
+                    <label class="form-label" for="title">ගෞරව නාමය <span style="color: red;">*</span></label>
+                    <select name="title" id="title" class="form-select">
+                        <option value="VEN" {% if teacher.title == 'VEN' %}selected{% endif %}>පූජ්‍ය (Venerable)</option>
+                        <option value="MR" {% if not is_edit or teacher.title == 'MR' %}selected{% endif %}>ගුරු මයා (Mr.)</option>
+                        <option value="MRS" {% if teacher.title == 'MRS' %}selected{% endif %}>ගුරු මිය (Mrs.)</option>
+                        <option value="MISS" {% if teacher.title == 'MISS' %}selected{% endif %}>මෙනවිය (Miss)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="name_initials">මුලකුරු සමඟ නම <span style="color: red;">*</span></label>
+                    <input type="text" name="name_initials" id="name_initials" class="form-control" required 
+                           value="{{ teacher.name_with_initials|default:'' }}"
+                           placeholder="උදා: ආර්. එම්. එන්. බණ්ඩාර">
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="full_name">සම්පූර්ණ නම (සිංහලෙන්) <span style="color: red;">*</span></label>
-                <input type="text" name="full_name" id="full_name" class="form-control" required placeholder="උදා: රත්නායක මුදියන්සේලාගේ නිරෝෂන් බණ්ඩාර">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="name_initials">මුලකුරු සමඟ නම <span style="color: red;">*</span></label>
-                <input type="text" name="name_initials" id="name_initials" class="form-control" required placeholder="උදා: ආර්. එම්. එන්. බණ්ඩාර">
+                <input type="text" name="full_name" id="full_name" class="form-control" required 
+                       value="{{ teacher.full_name_sinhala|default:'' }}"
+                       placeholder="උදා: රත්නායක මුදියන්සේලාගේ නිරෝෂන් බණ්ඩාර">
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                 <div class="form-group">
                     <label class="form-label" for="phone">දුරකථන අංකය <span style="color: red;">*</span></label>
-                    <input type="tel" name="phone" id="phone" class="form-control" required placeholder="07XXXXXXXX">
+                    <input type="tel" name="phone" id="phone" class="form-control" required 
+                           value="{{ teacher.phone|default:'' }}"
+                           placeholder="07XXXXXXXX">
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="whatsapp">වට්ස්ඇප් (WhatsApp)</label>
-                    <input type="tel" name="whatsapp" id="whatsapp" class="form-control" placeholder="07XXXXXXXX">
+                    <input type="tel" name="whatsapp" id="whatsapp" class="form-control" 
+                           value="{{ teacher.whatsapp_phone|default:'' }}"
+                           placeholder="07XXXXXXXX">
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="address">ලිපිනය</label>
-                <textarea name="address" id="address" class="form-control" rows="2" placeholder="ස්ථිර ලිපිනය"></textarea>
+                <textarea name="address" id="address" class="form-control" rows="2" 
+                          placeholder="ස්ථිර ලිපිනය">{{ teacher.address|default:'' }}</textarea>
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="qualifications">සුදුසුකම් (Qualifications)</label>
-                <textarea name="qualifications" id="qualifications" class="form-control" rows="2" placeholder="උදා: ධර්මාචාර්ය විභාගය, උපාධිය, පෙර පාසල් ඩිප්ලෝමාව"></textarea>
+                <textarea name="qualifications" id="qualifications" class="form-control" rows="2" 
+                          placeholder="උදා: ධර්මාචාර්ය විභාගය, උපාධිය, පෙර පාසල් ඩිප්ලෝමාව">{{ teacher.qualifications|default:'' }}</textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block" style="padding: 0.85rem; font-size: 1.05rem; margin-top: 1rem;">
-                💾 ගුරුභවතා පද්ධතියට එක් කරන්න
-            </button>
+            <div style="background: #fafafa; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.8rem 1rem; margin-bottom: 1.2rem;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 0;">
+                    <input type="checkbox" name="is_active" id="is_active" 
+                           {% if not is_edit or teacher.is_active %}checked{% endif %}
+                           style="width: 18px; height: 18px; accent-color: var(--primary-color);">
+                    <span style="font-weight: 600;">සක්‍රීය ගුරුභවතෙක් (Active Teacher Account)</span>
+                </label>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-left: 26px; margin-top: 2px;">
+                    අක්‍රිය කළහොත් මෙම ගුරුභවතාට පද්ධතියට ඇතුල් විය නොහැකි අතර පන්ති ලැයිස්තුවේ සක්‍රීය ලෙස නොපෙනේ.
+                </div>
+            </div>
+
+            {% if is_edit and teacher.allocations.all %}
+                <div style="background: #f1f2f6; border-radius: 6px; padding: 0.8rem 1rem; margin-bottom: 1.2rem;">
+                    <div style="font-weight: 600; font-size: 0.88rem; margin-bottom: 6px; color: #2c3e50;">
+                        📌 වත්මන් පන්ති අනුයුක්ත කිරීම්:
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        {% for alloc in teacher.allocations.all %}
+                            <span style="background: #ffffff; border: 1px solid #dcdde1; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">
+                                🌸 <strong>{{ alloc.class_section.grade_level.name }}</strong> [{{ alloc.subject }}]
+                                {% if alloc.is_class_teacher %}<span style="color: #27ae60; font-weight: bold;">(පන්තිභාර)</span>{% endif %}
+                            </span>
+                        {% endfor %}
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <a href="{% url 'allocate_teacher' %}" class="btn btn-outline btn-sm" style="font-size: 0.8rem;">
+                            📌 පන්ති අනුයුක්තය වෙනස් කරන්න
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                {% if is_edit %}
+                    <a href="{% url 'delete_teacher' teacher.id %}" class="btn btn-outline btn-sm" style="color: #e74c3c; border-color: #e74c3c;">
+                        🗑️ ගුරුභවතා ඉවත් කරන්න (Delete)
+                    </a>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.8rem; font-size: 1rem;">
+                        💾 තොරතුරු සුරකින්න (Save Changes)
+                    </button>
+                {% else %}
+                    <a href="{% url 'teacher_list' %}" class="btn btn-outline">අවලංගු කරන්න</a>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.8rem; font-size: 1.02rem;">
+                        💾 ගුරුභවතා පද්ධතියට එක් කරන්න
+                    </button>
+                {% endif %}
+            </div>
         </form>
     </div>
 </div>

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}ගුරුභවතා ඉවත් කිරීම - {{ teacher.display_name }} - දහම් පාසල{% endblock %}
+
+{% block content %}
+<div style="max-width: 620px; margin: 2rem auto;">
+    <div class="card-box" style="border-top: 4px solid var(--danger-red);">
+        <div class="card-header-temple">
+            <h2 style="color: var(--danger-red);">🗑️ ගුරුභවතා ඉවත් කිරීම (Remove Teacher)</h2>
+            <a href="{% url 'teacher_list' %}" class="btn btn-outline btn-sm">⬅️ ආපසු</a>
+        </div>
+
+        <!-- Teacher Information Summary -->
+        <div style="background: #fdfaf3; border: 1px solid #fae8c8; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h3 style="margin: 0; color: var(--primary-color);">{{ teacher.display_name }}</h3>
+                    <p style="margin: 4px 0 0 0; color: var(--text-muted); font-size: 0.9rem;">{{ teacher.full_name_sinhala }}</p>
+                </div>
+                {% if teacher.user %}
+                    <span style="background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 3px 8px; border-radius: 4px; font-family: monospace; font-size: 0.85rem; font-weight: 600;">
+                        🔑 {{ teacher.user.username }}
+                    </span>
+                {% endif %}
+            </div>
+            <div style="margin-top: 10px; font-size: 0.88rem; display: flex; gap: 15px; color: #555;">
+                <span>📞 දුරකථනය: <strong>{{ teacher.phone }}</strong></span>
+                {% if teacher.whatsapp_phone %}
+                    <span>💬 WhatsApp: <strong>{{ teacher.whatsapp_phone }}</strong></span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if allocations %}
+            <!-- Warning regarding Class Allocations -->
+            <div class="alert-box alert-warning" style="margin-bottom: 1.5rem;">
+                <h4 style="color: #c0392b; margin-bottom: 0.5rem;">⚠️ පන්ති අනුයුක්ත කිරීම් පවතී!</h4>
+                <p style="margin-bottom: 0.5rem;">
+                    මෙම ගුරුභවතා දැනට පහත පන්ති සඳහා අනුයුක්ත කර ඇත:
+                </p>
+                <ul style="margin: 0.5rem 0 0.5rem 1.5rem; font-size: 0.92rem;">
+                    {% for alloc in allocations %}
+                        <li>
+                            <strong>{{ alloc.class_section.grade_level.name }}</strong> - {{ alloc.subject }}
+                            {% if alloc.is_class_teacher %}
+                                <span style="color: #27ae60; font-weight: bold;">(ප්‍රධාන පන්තිභාර ගුරුභවතා)</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p style="font-size: 0.85rem; color: #7f8c8d; margin-top: 0.5rem; margin-bottom: 0;">
+                    මෙම ගුරුභවතා ඉවත් කළහොත් ඉහත පන්ති සඳහා නව ගුරුභවතෙකු අනුයුක්ත කිරීමට සිදු වේ.
+                </p>
+            </div>
+        {% endif %}
+
+        <div style="margin-bottom: 1.5rem;">
+            <p style="font-size: 1rem; color: #2c3e50; line-height: 1.5;">
+                ඔබට <strong>{{ teacher.display_name }}</strong> ගුරුභවතාගේ ගිණුම සම්බන්ධයෙන් සිදු කිරීමට අවශ්‍ය ක්‍රියාව තෝරන්න:
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem;">
+                <!-- Option 1: Deactivate (Recommended) -->
+                <div style="background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 6px; padding: 1rem; display: flex; align-items: flex-start; gap: 12px;">
+                    <input type="radio" name="action" id="action_deactivate" value="deactivate" checked style="margin-top: 4px; width: 18px; height: 18px;">
+                    <label for="action_deactivate" style="margin-bottom: 0; cursor: pointer;">
+                        <strong style="color: #d35400;">⏸️ ගිණුම අක්‍රිය කරන්න (Deactivate - නිර්දේශිතයි)</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                            පැරණි පැමිණීම් වාර්තා සහ ඉතිහාස දත්ත සුරක්ෂිතව පවතින අතර, ගුරුභවතාට පද්ධතියට පිවිසීම තාවකාලිකව අවහිර කරනු ලැබේ.
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Option 2: Permanent Delete -->
+                <div style="background: #fff5f5; border: 1px solid #fed7d7; border-radius: 6px; padding: 1rem; display: flex; align-items: flex-start; gap: 12px;">
+                    <input type="radio" name="action" id="action_delete" value="delete" style="margin-top: 4px; width: 18px; height: 18px;">
+                    <label for="action_delete" style="margin-bottom: 0; cursor: pointer;">
+                        <strong style="color: #c53030;">🗑️ ස්ථිරවම මකා දමන්න (Permanently Delete)</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                            ගුරුභවතාගේ පැතිකඩ, පිවිසුම් ගිණුම (User Account) සහ පන්ති අනුයුක්ත කිරීම් පද්ධතියෙන් ස්ථිරවම ඉවත් කරනු ලැබේ. මෙය ආපසු හැරවිය නොහැක.
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
+                <a href="{% url 'teacher_list' %}" class="btn btn-outline">
+                    ⬅️ අවලංගු කරන්න
+                </a>
+                <button type="submit" class="btn btn-danger" style="padding: 0.7rem 1.5rem;">
+                    තහවුරු කරන්න (Confirm Action)
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

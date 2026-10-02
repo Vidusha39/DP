@@ -35,15 +35,18 @@
                     <th>සුදුසුකම්</th>
                     <th>අනුයුක්ත පන්ති සහ විෂයයන්</th>
                     <th>ක්‍රියාකාරී</th>
+                    <th style="text-align: center;">ක්‍රියා (Actions)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for teacher in teachers %}
                 <tr>
                     <td>
-                        <strong style="color: var(--primary-color); font-size: 1.05rem;">
-                            {{ teacher.display_name }}
-                        </strong><br>
+                        <a href="{% url 'teacher_detail' teacher.id %}" style="text-decoration: none; color: inherit;" title="සම්පූර්ණ තොරතුරු බලන්න">
+                            <strong style="color: var(--primary-color); font-size: 1.05rem;">
+                                {{ teacher.display_name }}
+                            </strong>
+                        </a><br>
                         <small style="color: var(--text-muted);">{{ teacher.full_name_sinhala }}</small>
                         <div style="margin-top: 5px;">
                             <span style="display: inline-flex; align-items: center; gap: 4px; background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; padding: 2px 7px; border-radius: 4px; font-size: 0.8rem; font-family: monospace; font-weight: 600;" title="පද්ධති පරිශීලක නාමය">
@@ -81,16 +84,28 @@
                         </div>
                     </td>
                     <td>
-                        {% if teacher.is_active %}
-                            <span class="status-pill status-approved">ක්‍රියාකාරී</span>
-                        {% else %}
-                            <span class="status-pill status-rejected">අක්‍රිය</span>
-                        {% endif %}
+                        <a href="{% url 'toggle_teacher_status' teacher.id %}" style="text-decoration: none;" title="තත්ත්වය වෙනස් කිරීමට ක්ලික් කරන්න">
+                            {% if teacher.is_active %}
+                                <span class="status-pill status-approved" style="cursor: pointer;">ක්‍රියාකාරී</span>
+                            {% else %}
+                                <span class="status-pill status-rejected" style="cursor: pointer;">අක්‍රිය</span>
+                            {% endif %}
+                        </a>
+                    </td>
+                    <td style="text-align: center;">
+                        <div style="display: flex; gap: 4px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                            <a href="{% url 'edit_teacher' teacher.id %}" class="btn btn-outline btn-sm" style="padding: 3px 8px; font-size: 0.8rem;" title="තොරතුරු සංස්කරණය">
+                                ✏️ සංස්කරණය
+                            </a>
+                            <a href="{% url 'delete_teacher' teacher.id %}" class="btn btn-outline btn-sm" style="padding: 3px 8px; font-size: 0.8rem; color: #e74c3c; border-color: #fca5a5;" title="ගුරුභවතා ඉවත් කිරීම">
+                                🗑️ ඉවත්
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2rem;">
                         තවම ගුරුභවතුන් ලියාපදිංචි කර නොමැත.
                     </td>
                 </tr>

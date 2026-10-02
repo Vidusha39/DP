@@ -122,8 +122,153 @@ def allocate_teacher(request):
 @login_required
 def teacher_detail(request, teacher_id):
     teacher = get_object_or_404(Teacher, id=teacher_id)
-    allocations = teacher.allocations.select_related('class_section', 'class_section__grade_level')
+    allocations = teacher.allocations.select_related('class_section', 'class_section__grade_level', 'class_section__classroom')
     return render(request, 'teachers/teacher_detail.html', {
         'teacher': teacher,
         'allocations': allocations,
     })
+
+
+@login_required
+@principal_or_admin_required
+def edit_teacher(request, teacher_id):
+    """
+    Principal or Admin can edit teacher details, credentials, and active status.
+    """
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+    existing_username = teacher.user.username if teacher.user else ''
+
+    if request.method == 'POST':
+        title = request.POST.get('title', 'MR')
+        full_name = request.POST.get('full_name', '').strip()
+        name_initials = request.POST.get('name_initials', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        whatsapp = request.POST.get('whatsapp', '').strip()
+        address = request.POST.get('address', '').strip()
+        qualifications = request.POST.get('qualifications', '').strip()
+        is_active = request.POST.get('is_active') == 'on'
+        username = request.POST.get('username', '').strip()
+        new_password = request.POST.get('new_password', '').strip()
+
+        if not username or not full_name or not phone:
+            messages.error(request, 'කරුණාකර අවශ්‍ය සියලු තොරතුරු ඇතුළත් කරන්න.')
+            return render(request, 'teachers/teacher_form.html', {
+                'teacher': teacher,
+                'is_edit': True,
+                'existing_username': existing_username,
+            })
+
+        # Update or link User account
+        if teacher.user:
+            # Check username uniqueness if changed
+            if username != teacher.user.username:
+                if User.objects.filter(username=username).exclude(id=teacher.user.id).exists():
+                    messages.error(request, f'"{username}" පරිශීලක නාමය දැනටමත් භාවිතයේ පවතී.')
+                    return render(request, 'teachers/teacher_form.html', {
+                        'teacher': teacher,
+                        'is_edit': True,
+                        'existing_username': existing_username,
+                    })
+                teacher.user.username = username
+
+            if new_password:
+                teacher.user.set_password(new_password)
+
+            teacher.user.first_name = name_initials
+            teacher.user.is_active = is_active
+            teacher.user.save()
+
+            UserProfile.objects.update_or_create(
+                user=teacher.user,
+                defaults={'role': 'TEACHER', 'phone': phone}
+            )
+        else:
+            # Create user if teacher didn't have one
+            if User.objects.filter(username=username).exists():
+                messages.error(request, f'"{username}" පරිශීලක නාමය දැනටමත් භාවිතයේ පවතී.')
+                return render(request, 'teachers/teacher_form.html', {
+                    'teacher': teacher,
+                    'is_edit': True,
+                    'existing_username': existing_username,
+                })
+            user = User.objects.create_user(username=username, password=new_password or 'teacher123')
+            user.first_name = name_initials
+            user.is_active = is_active
+            user.save()
+            UserProfile.objects.create(user=user, role='TEACHER', phone=phone)
+            teacher.user = user
+
+        # Update Teacher record
+        teacher.title = title
+        teacher.full_name_sinhala = full_name
+        teacher.name_with_initials = name_initials
+        teacher.phone = phone
+        teacher.whatsapp_phone = whatsapp or phone
+        teacher.address = address
+        teacher.qualifications = qualifications
+        teacher.is_active = is_active
+        teacher.save()
+
+        pwd_msg = " (නව මුරපදය ද යාවත්කාලීන විය)" if new_password else ""
+        messages.success(request, f'ගුරුභවතා {teacher.display_name} ගේ තොරතුරු සාර්ථකව යාවත්කාලීන කරන ලදී.{pwd_msg}')
+        return redirect('teacher_list')
+
+    return render(request, 'teachers/teacher_form.html', {
+        'teacher': teacher,
+        'is_edit': True,
+        'existing_username': existing_username,
+    })
+
+
+@login_required
+@principal_or_admin_required
+def delete_teacher(request, teacher_id):
+    """
+    Principal or Admin can remove or deactivate a teacher.
+    """
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+    allocations = teacher.allocations.select_related('class_section__grade_level').all()
+
+    if request.method == 'POST':
+        action = request.POST.get('action', 'delete')
+        teacher_name = teacher.display_name
+
+        if action == 'deactivate':
+            teacher.is_active = False
+            teacher.save()
+            if teacher.user:
+                teacher.user.is_active = False
+                teacher.user.save()
+            messages.success(request, f'ගුරුභවතා {teacher_name} ගේ ගිණුම සාර්ථකව අක්‍රිය කරන ලදී (Deactivated).')
+            return redirect('teacher_list')
+        else:
+            # Permanent delete
+            auth_user = teacher.user
+            teacher.delete()
+            if auth_user:
+                auth_user.delete()
+            messages.success(request, f'ගුරුභවතා {teacher_name} සාර්ථකව පද්ධතියෙන් ඉවත් කරන ලදී (Deleted).')
+            return redirect('teacher_list')
+
+    return render(request, 'teachers/teacher_confirm_delete.html', {
+        'teacher': teacher,
+        'allocations': allocations,
+    })
+
+
+@login_required
+@principal_or_admin_required
+def toggle_teacher_status(request, teacher_id):
+    """
+    Quickly toggles active status of teacher and their login account.
+    """
+    teacher = get_object_or_404(Teacher, id=teacher_id)
+    teacher.is_active = not teacher.is_active
+    teacher.save()
+    if teacher.user:
+        teacher.user.is_active = teacher.is_active
+        teacher.user.save()
+
+    status_str = "සක්‍රීය" if teacher.is_active else "අක්‍රිය"
+    messages.success(request, f'{teacher.display_name} ගේ ගිණුම සාර්ථකව {status_str} කරන ලදී.')
+    return redirect('teacher_list')
