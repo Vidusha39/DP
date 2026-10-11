@@ -8,7 +8,8 @@
         <div style="text-align: center; margin-bottom: 1.5rem;">
             <div style="font-size: 2.5rem; color: var(--accent-gold);">☸</div>
             <h2 style="margin-top: 0.5rem; font-size: 1.5rem;">පද්ධති ප්‍රවේශය</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">පරිපාලක, ප්‍රධානාචාර්ය හෝ ආචාර්ය මණ්ඩලය සඳහා පිවිසුම</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">පරිපාලක, ප්‍රධානාචාර්ය හෝ ආචාර්ය මණ්ඩලය සඳහා පිවිසුම
+            </p>
         </div>
 
         <form method="post" id="loginForm">
@@ -31,24 +32,25 @@
         </form>
 
         <!-- Easy Credentials & Quick Fill Helper -->
-        <div style="margin-top: 1.8rem; padding-top: 1.2rem; border-top: 1px dashed var(--border-color); font-size: 0.88rem;">
+        <div
+            style="margin-top: 1.8rem; padding-top: 1.2rem; border-top: 1px dashed var(--border-color); font-size: 0.88rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
                 <span style="font-weight: 700; color: #8a1414; display: flex; align-items: center; gap: 5px;">
                     🔑 ඉක්මන් පිවිසුම් තොරතුරු (Quick Credentials)
                 </span>
-                <span style="font-size: 0.75rem; color: var(--text-muted); background: #f1f2f6; padding: 2px 6px; border-radius: 4px;">
+                <span
+                    style="font-size: 0.75rem; color: var(--text-muted); background: #f1f2f6; padding: 2px 6px; border-radius: 4px;">
                     ක්ලික් කර ක්ෂණිකව පුරවන්න
                 </span>
             </div>
 
             <!-- Admin & Principal Buttons -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-                <button type="button" onclick="fillCredentials('admin', 'admin123')"
-                    class="btn btn-outline btn-sm"
+                <button type="button" onclick="fillCredentials('admin', 'admin123')" class="btn btn-outline btn-sm"
                     style="text-align: left; padding: 0.5rem 0.75rem; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
                     <div>
                         <span style="font-size: 1rem;">👑</span> <strong>පරිපාලක (Admin)</strong>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">admin / admin123</div>
+
                     </div>
                     <span style="color: var(--primary-color); font-weight: bold; font-size: 0.8rem;">පුරවන්න</span>
                 </button>
@@ -58,47 +60,54 @@
                     style="text-align: left; padding: 0.5rem 0.75rem; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;">
                     <div>
                         <span style="font-size: 1rem;">🏛</span> <strong>ප්‍රධානාචාර්ය (Principal)</strong>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace;">principal / principal123</div>
+
                     </div>
                     <span style="color: var(--primary-color); font-weight: bold; font-size: 0.8rem;">පුරවන්න</span>
                 </button>
             </div>
 
             <!-- Teachers Dropdown Quick Selector -->
-            <div style="background: #fdfaf3; border: 1px solid #fae8c8; border-radius: 8px; padding: 0.75rem; margin-bottom: 10px;">
-                <div style="font-weight: 600; font-size: 0.83rem; margin-bottom: 6px; color: #8a1414; display: flex; align-items: center; gap: 5px;">
+            <div
+                style="background: #fdfaf3; border: 1px solid #fae8c8; border-radius: 8px; padding: 0.75rem; margin-bottom: 10px;">
+                <div
+                    style="font-weight: 600; font-size: 0.83rem; margin-bottom: 6px; color: #8a1414; display: flex; align-items: center; gap: 5px;">
                     <span>📖</span> <strong>ගුරුභවතුන් සඳහා පිවිසුම (Teacher Logins - 1 සිට 13 ශ්‍රේණි):</strong>
                 </div>
-                
+
                 <div style="display: flex; gap: 6px;">
-                    <select id="quickTeacherSelect" class="form-select" style="font-size: 0.85rem; padding: 0.4rem 0.6rem;">
+                    <select id="quickTeacherSelect" class="form-select"
+                        style="font-size: 0.85rem; padding: 0.4rem 0.6rem;">
                         <option value="">-- ගුරුභවතෙක් හෝ ශ්‍රේණියක් තෝරන්න --</option>
                         {% for teacher in teachers %}
-                            {% with alloc=teacher.allocations.first %}
-                                <option value="{{ teacher.user.username }}" data-pass="teacher123">
-                                    {{ teacher.user.username }} - {{ teacher.display_name }} {% if alloc %}({{ alloc.class_section.grade_level.name }}){% endif %}
-                                </option>
-                            {% endwith %}
+                        {% with alloc=teacher.allocations.first %}
+                        <option value="{{ teacher.user.username }}" data-pass="teacher123">
+                            {{ teacher.user.username }} - {{ teacher.display_name }} {% if alloc %}({{
+                            alloc.class_section.grade_level.name }}){% endif %}
+                        </option>
+                        {% endwith %}
                         {% empty %}
-                            <option value="teacher1" data-pass="teacher123">teacher1 - 1 ශ්‍රේණිය පන්තිභාර</option>
-                            <option value="teacher2" data-pass="teacher123">teacher2 - 2 ශ්‍රේණිය පන්තිභාර</option>
-                            <option value="teacher3" data-pass="teacher123">teacher3 - 3 ශ්‍රේණිය පන්තිභාර</option>
-                            <option value="teacher4" data-pass="teacher123">teacher4 - 4 ශ්‍රේණිය පන්තිභාර</option>
-                            <option value="teacher5" data-pass="teacher123">teacher5 - 5 ශ්‍රේණිය පන්තිභාර</option>
+                        <option value="teacher1" data-pass="teacher123">teacher1 - 1 ශ්‍රේණිය පන්තිභාර</option>
+                        <option value="teacher2" data-pass="teacher123">teacher2 - 2 ශ්‍රේණිය පන්තිභාර</option>
+                        <option value="teacher3" data-pass="teacher123">teacher3 - 3 ශ්‍රේණිය පන්තිභාර</option>
+                        <option value="teacher4" data-pass="teacher123">teacher4 - 4 ශ්‍රේණිය පන්තිභාර</option>
+                        <option value="teacher5" data-pass="teacher123">teacher5 - 5 ශ්‍රේණිය පන්තිභාර</option>
                         {% endfor %}
                     </select>
-                    <button type="button" onclick="fillSelectedTeacher()" class="btn btn-gold btn-sm" style="white-space: nowrap; padding: 0.4rem 0.8rem;">
+                    <button type="button" onclick="fillSelectedTeacher()" class="btn btn-gold btn-sm"
+                        style="white-space: nowrap; padding: 0.4rem 0.8rem;">
                         පුරවන්න
                     </button>
                 </div>
 
                 <div style="margin-top: 6px; font-size: 0.78rem; color: #7f8c8d;">
-                    💡 සියලු ගුරුභවතුන්ගේ මුරපදය: <strong style="color: #2c3e50; font-family: monospace;">teacher123</strong>
+                    💡 සියලු ගුරුභවතුන්ගේ මුරපදය: <strong
+                        style="color: #2c3e50; font-family: monospace;">teacher123</strong>
                 </div>
             </div>
 
             <!-- Toggle Full Credentials List -->
-            <details style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.6rem 0.8rem;">
+            <details
+                style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 0.6rem 0.8rem;">
                 <summary style="cursor: pointer; font-weight: 600; color: var(--primary-color); font-size: 0.83rem;">
                     📋 සියලුම ගුරුභවතුන්ගේ Username සහ විස්තර ලැයිස්තුව (View All Teacher Usernames)
                 </summary>
@@ -115,36 +124,43 @@
                         <tbody>
                             <tr style="border-bottom: 1px solid #eee;">
                                 <td style="padding: 4px 6px;"><strong>🏛 ප්‍රධානාචාර්ය</strong></td>
-                                <td style="padding: 4px 6px;">පූජ්‍ය ධම්මරතන හිමි</td>
+                                <td style="padding: 4px 6px;">පූජ්‍ය හිමි</td>
                                 <td style="padding: 4px 6px;"><code style="color: #e67e22;">principal</code></td>
                                 <td style="padding: 4px 6px; text-align: center;">
-                                    <button type="button" class="btn btn-outline btn-sm" style="padding: 1px 6px; font-size: 0.72rem;" onclick="fillCredentials('principal', 'principal123')">Fill</button>
+                                    <button type="button" class="btn btn-outline btn-sm"
+                                        style="padding: 1px 6px; font-size: 0.72rem;"
+                                        onclick="fillCredentials('principal', 'principal123')">Fill</button>
                                 </td>
                             </tr>
                             {% for teacher in teachers %}
                             <tr style="border-bottom: 1px solid #eee;">
                                 <td style="padding: 4px 6px;">
                                     {% with alloc=teacher.allocations.first %}
-                                        <strong>{{ alloc.class_section.grade_level.name|default:"ගුරුභවතා" }}</strong>
+                                    <strong>{{ alloc.class_section.grade_level.name|default:"ගුරුභවතා" }}</strong>
                                     {% endwith %}
                                 </td>
                                 <td style="padding: 4px 6px;">{{ teacher.name_with_initials }}</td>
-                                <td style="padding: 4px 6px;"><code style="color: #2980b9;">{{ teacher.user.username }}</code></td>
+                                <td style="padding: 4px 6px;"><code
+                                        style="color: #2980b9;">{{ teacher.user.username }}</code></td>
                                 <td style="padding: 4px 6px; text-align: center;">
-                                    <button type="button" class="btn btn-outline btn-sm" style="padding: 1px 6px; font-size: 0.72rem;" onclick="fillCredentials('{{ teacher.user.username }}', 'teacher123')">Fill</button>
+                                    <button type="button" class="btn btn-outline btn-sm"
+                                        style="padding: 1px 6px; font-size: 0.72rem;"
+                                        onclick="fillCredentials('{{ teacher.user.username }}', 'teacher123')">Fill</button>
                                 </td>
                             </tr>
                             {% empty %}
-                                {% for i in "12345678910111213" %}
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 4px 6px;">{{ forloop.counter }} ශ්‍රේණිය</td>
-                                    <td style="padding: 4px 6px;">ගුරුභවතා {{ forloop.counter }}</td>
-                                    <td style="padding: 4px 6px;"><code>teacher{{ forloop.counter }}</code></td>
-                                    <td style="padding: 4px 6px; text-align: center;">
-                                        <button type="button" class="btn btn-outline btn-sm" style="padding: 1px 6px; font-size: 0.72rem;" onclick="fillCredentials('teacher{{ forloop.counter }}', 'teacher123')">Fill</button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
+                            {% for i in "12345678910111213" %}
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 4px 6px;">{{ forloop.counter }} ශ්‍රේණිය</td>
+                                <td style="padding: 4px 6px;">ගුරුභවතා {{ forloop.counter }}</td>
+                                <td style="padding: 4px 6px;"><code>teacher{{ forloop.counter }}</code></td>
+                                <td style="padding: 4px 6px; text-align: center;">
+                                    <button type="button" class="btn btn-outline btn-sm"
+                                        style="padding: 1px 6px; font-size: 0.72rem;"
+                                        onclick="fillCredentials('teacher{{ forloop.counter }}', 'teacher123')">Fill</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>
@@ -155,45 +171,45 @@
 </div>
 
 <script>
-function fillCredentials(username, password) {
-    const userInput = document.getElementById('username');
-    const passInput = document.getElementById('password');
-    userInput.value = username;
-    passInput.value = password;
+    function fillCredentials(username, password) {
+        const userInput = document.getElementById('username');
+        const passInput = document.getElementById('password');
+        userInput.value = username;
+        passInput.value = password;
 
-    // Visual feedback
-    userInput.style.transition = 'all 0.3s ease';
-    passInput.style.transition = 'all 0.3s ease';
-    userInput.style.borderColor = '#e67e22';
-    passInput.style.borderColor = '#e67e22';
-    userInput.style.boxShadow = '0 0 6px rgba(230, 126, 34, 0.4)';
-    passInput.style.boxShadow = '0 0 6px rgba(230, 126, 34, 0.4)';
+        // Visual feedback
+        userInput.style.transition = 'all 0.3s ease';
+        passInput.style.transition = 'all 0.3s ease';
+        userInput.style.borderColor = '#e67e22';
+        passInput.style.borderColor = '#e67e22';
+        userInput.style.boxShadow = '0 0 6px rgba(230, 126, 34, 0.4)';
+        passInput.style.boxShadow = '0 0 6px rgba(230, 126, 34, 0.4)';
 
-    setTimeout(() => {
-        userInput.style.borderColor = '';
-        passInput.style.borderColor = '';
-        userInput.style.boxShadow = '';
-        passInput.style.boxShadow = '';
-    }, 700);
-}
-
-function fillSelectedTeacher() {
-    const sel = document.getElementById('quickTeacherSelect');
-    if (!sel || !sel.value) {
-        alert('කරුණාකර ගුරුභවතෙක් තෝරන්න (Please select a teacher from the dropdown).');
-        return;
+        setTimeout(() => {
+            userInput.style.borderColor = '';
+            passInput.style.borderColor = '';
+            userInput.style.boxShadow = '';
+            passInput.style.boxShadow = '';
+        }, 700);
     }
-    const username = sel.value;
-    const selectedOption = sel.options[sel.selectedIndex];
-    const password = selectedOption.getAttribute('data-pass') || 'teacher123';
-    fillCredentials(username, password);
-}
 
-// Automatically fill on dropdown change for maximum ease
-document.getElementById('quickTeacherSelect')?.addEventListener('change', function() {
-    if (this.value) {
-        fillSelectedTeacher();
+    function fillSelectedTeacher() {
+        const sel = document.getElementById('quickTeacherSelect');
+        if (!sel || !sel.value) {
+            alert('කරුණාකර ගුරුභවතෙක් තෝරන්න (Please select a teacher from the dropdown).');
+            return;
+        }
+        const username = sel.value;
+        const selectedOption = sel.options[sel.selectedIndex];
+        const password = selectedOption.getAttribute('data-pass') || 'teacher123';
+        fillCredentials(username, password);
     }
-});
+
+    // Automatically fill on dropdown change for maximum ease
+    document.getElementById('quickTeacherSelect')?.addEventListener('change', function () {
+        if (this.value) {
+            fillSelectedTeacher();
+        }
+    });
 </script>
 {% endblock %}
