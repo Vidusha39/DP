@@ -14,8 +14,8 @@ pip install -r requirements.txt
 echo "=== Running database migrations ==="
 python manage.py migrate
 
-echo "=== Populating initial seed data ==="
-python manage.py seed_data
+# echo "=== Populating initial seed data ==="
+# python manage.py seed_data
 
 echo "=== Collecting static files ==="
 python manage.py collectstatic --noinput
